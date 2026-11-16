@@ -61,7 +61,8 @@ app.use('/', express.static(path.join(__dirname, '../../landingpage')));
 // permintaan /wdqms/* ke frontend v2 (Next.js).
 app.use('/wdqms', (req, res) => {
     const suffix = req.originalUrl.replace(/^\/wdqms/, '') || '/';
-    const target = suffix.startsWith('/') ? suffix : '/' + suffix;
+    // /wdqms dan /wdqms/ langsung ke halaman dashboard v2
+    const target = (suffix === '/' || suffix === '') ? '/wdqms' : suffix;
     res.redirect(302, WDQMS_V2_WEB_URL + target);
 });
 
