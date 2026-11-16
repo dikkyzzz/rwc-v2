@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Yearly Report of RWC Indonesia 2024 — RWC in Pilot Mode. WDQMS monitoring, IMS tickets, and WIGOS metadata management across WMO Region V and WMO members supported by BMKG Indonesia.">
+    <title>Yearly Report of RWC Indonesia 2024</title>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="icon" href="/logo-update.svg" type="image/svg+xml">
+    <style>
+        /* Sub-page specific additions (global theme comes from style.css) */
+        .page-hero { padding: 9rem 0 3rem; text-align: center; }
+        .content-section { padding: 3rem 0; }
+        .content-section h3 { font-size: 1.4rem; font-weight: 800; color: var(--primary); margin: 2rem 0 1rem; }
+        .content-section h4 { font-size: 1.05rem; font-weight: 700; color: var(--primary-dark); margin: 1.5rem 0 .75rem; }
+        .content-section p { color: var(--gray-700); line-height: 1.8; margin-bottom: 1rem; }
+        .content-section ul.bullet { list-style: disc; padding-left: 1.5rem; margin: 0 0 1rem; }
+        .content-section ul.bullet li { margin-bottom: .5rem; line-height: 1.7; }
+
+
+        /* Key figures grid */
+        .key-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin: 1.5rem 0; }
+        .key-stats .ks-card { background: #f9fbff; border: 1px solid var(--gray-200); border-radius: 14px; padding: 1.25rem 1rem; text-align: center; }
+        .key-stats .ks-value { font-size: 1.8rem; font-weight: 800; color: var(--primary); display: block; }
+        .key-stats .ks-label { font-size: .76rem; color: var(--gray-500); text-transform: uppercase; letter-spacing: .04em; font-weight: 700; margin-top: .35rem; display: block; }
+        @media (max-width: 768px) { .key-stats { grid-template-columns: repeat(2, 1fr); } }
+
+        /* Country station distribution */
+        .country-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: .8rem; margin: 1.25rem 0; }
+        .country-pill { display: flex; align-items: center; justify-content: space-between; gap: .5rem; background: #f9fbff; border: 1px solid var(--gray-200); border-radius: 50px; padding: .55rem 1rem; font-size: .85rem; }
+        .country-pill .country-name { font-weight: 700; color: var(--primary-dark); }
+        .country-pill .country-count { font-weight: 800; color: var(--accent); background: rgba(47,111,228,.10); padding: .15rem .6rem; border-radius: 50px; }
+
+        /* Tables */
+        .report-table-wrap { overflow-x: auto; margin: 1.25rem 0 2rem; border-radius: 16px; border: 1px solid rgba(19,49,95,.12); }
+        .report-table { width: 100%; border-collapse: collapse; font-size: .82rem; background: #fff; min-width: 720px; }
+        .report-table caption { caption-side: top; text-align: left; font-weight: 700; padding: .85rem 1rem; background: rgba(47,111,228,.07); color: var(--primary-dark); border-bottom: 1px solid rgba(19,49,95,.1); }
+        .report-table th { background: rgba(47,111,228,.09); text-align: left; padding: .7rem .85rem; white-space: nowrap; color: var(--primary-dark); font-size: .76rem; text-transform: uppercase; letter-spacing: .03em; }
+        .report-table td { padding: .7rem .85rem; border-top: 1px solid rgba(19,49,95,.1); vertical-align: top; line-height: 1.55; color: var(--gray-700); }
+        .report-table td.status-closed { color: #15803d; font-weight: 700; white-space: nowrap; }
+        .report-table td.status-open { color: #b45309; font-weight: 700; white-space: nowrap; }
+        .report-table td.status-wont { color: #64748b; font-weight: 700; white-space: nowrap; }
+        .report-table tr.section-row td { background: rgba(19,49,95,.05); font-weight: 700; color: var(--primary-dark); text-transform: uppercase; letter-spacing: .04em; font-size: .78rem; }
+        .report-table tr:hover td { background: rgba(47,111,228,.04); }
+        .report-table tr.section-row:hover td { background: rgba(19,49,95,.07); }
+        .wsid { font-family: 'Courier New', monospace; font-size: .76rem; color: var(--gray-500); word-break: break-all; }
+
+        /* Accordion (click-to-expand) — dipakai untuk Table 1 per-negara */
+        .report-accordion { margin: 1.25rem 0 2rem; }
+        .report-accordion > summary { list-style: none; cursor: pointer; padding: .9rem 1.25rem; font-weight: 700; background: rgba(47,111,228,.07); display: flex; align-items: center; justify-content: space-between; gap: 1rem; color: var(--primary-dark); border: 1px solid rgba(19,49,95,.12); border-radius: 16px; margin-bottom: .5rem; }
+        .report-accordion > summary::-webkit-details-marker { display: none; }
+        .report-accordion > summary::after { content: "\f078"; font-family: "Font Awesome 6 Free"; font-weight: 900; font-size: .8rem; transition: transform .2s ease; }
+        .report-accordion[open] > summary::after { transform: rotate(180deg); }
+        .report-accordion > summary .acc-title { display: inline-flex; align-items: center; gap: .5rem; line-height: 1.2; }
+        .report-accordion > summary .acc-count { display: inline-flex; align-items: center; justify-content: center; line-height: 1; white-space: nowrap; font-size: .75rem; font-weight: 700; color: #fff; background: var(--accent); padding: .25rem .65rem; border-radius: 50px; min-height: 1.5rem; }
+        .report-accordion .report-table-wrap { margin: 0 0 1rem; border-radius: 12px; }
+        .report-accordion .report-table { min-width: 640px; }
+        @media (max-width: 768px) { .report-accordion > summary { font-size: .85rem; padding: .8rem 1rem; } }
+
+        .agenda-note { font-size: .82rem; opacity: .75; margin-top: 1rem; }
+        .back-link { display: inline-flex; align-items: center; gap: .4rem; margin-bottom: 1.5rem; font-weight: 700; }
+        .download-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; padding: 1.25rem 1.5rem; background: linear-gradient(135deg, rgba(47,111,228,.08), rgba(124,184,255,.06)); border: 1px solid rgba(47,111,228,.18); border-radius: 16px; margin: 2rem 0; }
+        .download-bar .dl-text { flex: 1; min-width: 220px; }
+        .download-bar .dl-text strong { color: var(--primary-dark); display: block; margin-bottom: .2rem; }
+        .download-bar .dl-text span { color: var(--gray-500); font-size: .85rem; }
+        .download-bar .dl-btn { display: inline-flex; align-items: center; gap: .5rem; padding: .75rem 1.25rem; border-radius: 12px; font-weight: 700; color: #fff; background: linear-gradient(135deg, var(--primary), var(--primary-mid)); text-decoration: none; transition: all .2s ease; }
+        .download-bar .dl-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(30,79,156,.22); }
+
+        .report-meta-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-top: 2rem; }
+        .report-meta-grid .service-icon { margin: 0 0 .9rem; width: 54px; height: 54px; font-size: 1.35rem; border-radius: 14px; }
+        .report-meta-card { text-align: left; padding: 1.4rem 1.5rem; }
+        .report-meta-card small { display: block; text-transform: uppercase; letter-spacing: .08em; font-size: .7rem; font-weight: 700; opacity: .7; margin-bottom: .3rem; }
+        .report-meta-card strong { font-size: .92rem; line-height: 1.55; }
+        @media (max-width: 992px) { .report-meta-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 600px) { .report-meta-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+
+<body>
+
+    <!-- ========== HEADER ========== -->
+    <header id="header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="/" class="nav-brand">
+                    <img src="/logo-update.svg" alt="RWC Indonesia Logo">
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a href="/">Home</a>
+                    <a href="/#dashboards">Dashboards</a>
+                    <a href="/#about">About</a>
+                    <a href="/#services">Services</a>
+                    <a href="/activities">Activities</a>
+                    <a href="/reports" class="active">Reports</a>
+                    <a href="/#contact" class="nav-cta">Contact</a>
+                </div>
+                <button class="hamburger" id="hamburger" aria-label="Menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ========== DETAIL ========== -->
+    <section class="page-hero">
+        <div class="container">
+            <a class="back-link" href="/reports"><i class="fas fa-arrow-left"></i> All reports</a>
+            <div class="section-title animate-on-scroll">
+                <h2>Yearly Report of RWC Indonesia 2024</h2>
+                <p>RWC in Pilot Mode &middot; Annual report of the Regional WIGOS Centre Indonesia for WMO Region V and
+                    WMO members supported by BMKG &middot; Calendar year 2024</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="content-section">
+        <div class="container">
+            <div class="report-meta-grid">
+                <div class="service-card report-meta-card animate-on-scroll">
+                    <div class="service-icon"><i class="fas fa-calendar-alt"></i></div>
+                    <small>Reporting Period</small>
+                    <strong>1 January &ndash; 31 December 2024</strong>
+                </div>
+            </div>
+
+            <h3>I. Introduction</h3>
+            <p>The Regional WIGOS Centre Indonesia operates as a <strong>single multifunctional RWC</strong>,
+                with this report covering the activities of the whole RWC for calendar year 2024.</p>
+            <p>The systems used in RWC Indonesia activities during 2024 were:</p>
+            <ul class="bullet">
+                <li>WIGOS Data Quality Monitoring System (WDQMS)</li>
+                <li>Incident Management System (IMS)</li>
+                <li>OSCAR/Surface Metadata Management</li>
+            </ul>
+            <p>This report is the result of monitoring from all Numerical Weather Prediction (NWP) Centres available in
+                WDQMS: <strong>DWD, ECMWF, JMA, and NCEP</strong>.</p>
+
+            <h3>II. WDQMS-Related Functions</h3>
+            <p>During 2024, RWC Indonesia monitored <strong>218 stations spread across 8 countries</strong>. Monitoring
+                was carried out on surface land and upper-air observation data from all countries, except Timor-Leste
+                which does not send upper-air data. Surface land observations consist of 5 variables: surface
+                pressure, 2m temperature, 10m zonal wind, 10m meridional wind, and relative humidity.</p>
+
+            <div class="key-stats">
+                <div class="ks-card"><span class="ks-value">218</span><span class="ks-label">Stations Monitored</span></div>
+                <div class="ks-card"><span class="ks-value">8</span><span class="ks-label">Countries</span></div>
+                <div class="ks-card"><span class="ks-value">80</span><span class="ks-label">Surface Tickets</span></div>
+                <div class="ks-card"><span class="ks-value">14</span><span class="ks-label">Upper-air Tickets</span></div>
+            </div>
+
+            <h4>Station distribution per country</h4>
+            <div class="country-grid">
+                <div class="country-pill"><span class="country-name">Indonesia (IDN)</span><span class="country-count">110</span></div>
+                <div class="country-pill"><span class="country-name">Philippines (PHL)</span><span class="country-count">50</span></div>
+                <div class="country-pill"><span class="country-name">Malaysia (MYS)</span><span class="country-count">33</span></div>
+                <div class="country-pill"><span class="country-name">Papua New Guinea (PNG)</span><span class="country-count">14</span></div>
+                <div class="country-pill"><span class="country-name">United States (USA)</span><span class="country-count">6</span></div>
+                <div class="country-pill"><span class="country-name">Timor-Leste (TLS)</span><span class="country-count">3</span></div>
+                <div class="country-pill"><span class="country-name">Singapore (SGP)</span><span class="country-count">1</span></div>
+                <div class="country-pill"><span class="country-name">Brunei (BRN)</span><span class="country-count">1</span></div>
+            </div>
+
+            <p>The proportion of data received in ECMWF against expected data (per OSCAR metadata) for each variable is
+                shown in Figure 1 of the original PDF. Notably, <strong>Timor-Leste had not sent any data to be
+                    exchanged</strong>, and <strong>Papua New Guinea had not submitted upper-air data</strong>.</p>
+
+            <p>In daily monitoring, when an issue occurs at a station, a ticket is created in the IMS on the JIRA portal.
+                However, if the station does not have a National Focal Point (NFP) &mdash; such as Timor-Leste and
+                Papua New Guinea &mdash; the ticket is only recorded on Google Drive. During 2024 there were
+                <strong>80 tickets</strong> related to surface land availability (Surf_A), surface land quality
+                (Surf_Q), and upper-air availability (Upp_A):</p>
+            <ul class="bullet">
+                <li>Surface land availability (Surf_A): <strong>62 tickets</strong></li>
+                <li>Surface land quality (Surf_Q): <strong>4 tickets</strong></li>
+                <li>Upper-air availability (Upp_A): <strong>14 tickets</strong></li>
+            </ul>
+            <p>The number of issues per country and their current status in IMS is shown in Figure 2 of the original
+                PDF. Details of tickets and issues are given in Table 1 and Table 2 below.</p>
+
+            <h4>Table 1 &mdash; Tickets created at IMS regarding surface land observations in 2024</h4>
+            <p style="margin-bottom:1rem;">Click a country to expand the list of surface-land tickets. A total of
+                <strong>66 tickets</strong> were recorded across 6 countries.</p>
+
+            <details class="report-accordion">
+                <summary><span class="acc-title">Indonesia</span><span class="acc-count">36 tickets</span></summary>
+                <div class="report-table-wrap">
+                    <table class="report-table">
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>Date issue raised</th>
+                                <th>Variable(s) with issues</th>
+                                <th>Station / WIGOS ID</th>
+                                <th>Category</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>1</td><td>26 Feb 2024</td><td>All variables &mdash; Exp: 24, Recv: 8</td><td>Ujung Pandang / Hasanuddin<br><span class="wsid">0-20000-0-97180</span></td><td>Availability</td><td class="status-closed">Closed (10 Feb 2024)</td></tr>
+                            <tr><td>2</td><td>28 Feb 2024</td><td>All variables &mdash; Exp: 7, Recv: 0</td><td>Sarmi / Mararena<br><span class="wsid">0-20000-0-97580</span></td><td>Availability</td><td class="status-open">Open (black node)</td></tr>
+                            <tr><td>3</td><td>3 Mar 2024</td><td>Surface pressure, temperature &mdash; Exp: 24, Recv: 8</td><td>Pekanbaru / Simpang Tiga<br><span class="wsid">0-20000-0-96109</span></td><td>Availability</td><td class="status-closed">Closed (19 Mar 2024)</td></tr>
+                            <tr><td>4</td><td>9 Jul 2024</td><td>Surface pressure &mdash; RMSE 1&ndash;5</td><td>Bau-Bau / Beto Ambari<br><span class="wsid">0-20000-0-97192</span></td><td>Quality</td><td class="status-open">Open (yellow node)</td></tr>
+                            <tr><td>5</td><td>15 Jul 2024</td><td>Surface pressure &mdash; RMSE 1&ndash;5</td><td>Kolaka / Pomala<br><span class="wsid">0-20000-0-97142</span></td><td>Quality</td><td class="status-closed">Closed (2 Aug 2024)</td></tr>
+                            <tr><td>6</td><td>23 Jul 2024</td><td>All variables &mdash; Exp: 24, Recv: 16</td><td>Sibolga / Pinangsori<br><span class="wsid">0-20000-0-96073</span></td><td>Availability (GBON)</td><td class="status-open">Open (orange node)</td></tr>
+                            <tr><td>7</td><td>12 Aug 2024</td><td>Surface pressure &mdash; RMSE 1&ndash;5</td><td>Serui / Sujarwo Condro Negoro<br><span class="wsid">0-20000-0-97570</span></td><td>Quality</td><td class="status-closed">Closed (5 Sep 2024)</td></tr>
+                            <tr><td>8</td><td>12 Aug 2024</td><td>All variables &mdash; RMSE 1&ndash;5</td><td>Timika<br><span class="wsid">0-20000-0-97796</span></td><td>Quality</td><td class="status-closed">Closed (5 Sep 2024)</td></tr>
+                            <tr><td>9</td><td>11 Oct 2024</td><td>All variables &mdash; Exp: 24, Recv: 6</td><td>Balikpapan<br><span class="wsid">0-20000-0-96633</span></td><td>Availability</td><td class="status-open">Open (red node)</td></tr>
+                            <tr><td>10</td><td>11 Oct 2024</td><td>All variables &mdash; Exp: 24, Recv: 6</td><td>Bau-Bau<br><span class="wsid">0-20000-0-97192</span></td><td>Availability</td><td class="status-closed">Closed (3 Jan 2025)</td></tr>
+                            <tr><td>11</td><td>1 Nov 2024</td><td>All variables &mdash; Exp: 7, Recv: 8</td><td>Fak-Fak / Torea<br><span class="wsid">0-20000-0-97630</span></td><td>Availability</td><td class="status-open">Open (orange node)</td></tr>
+                            <tr><td>12</td><td>13 Nov 2024</td><td>All variables &mdash; Exp: 24, Recv: 6</td><td>Balikpapan / Sepinggan<br><span class="wsid">0-20000-0-96633</span></td><td>Availability</td><td class="status-open">Open (red node)</td></tr>
+                            <tr><td>13</td><td>13 Nov 2024</td><td>All variables &mdash; Exp: 24, Recv: 6</td><td>Bau-Bau / Beto Ambari<br><span class="wsid">0-20000-0-97192</span></td><td>Availability</td><td class="status-closed">Closed (3 Jan 2025)</td></tr>
+                            <tr><td>14</td><td>21 Nov 2024</td><td>All variables &mdash; Exp: 24, Recv: 8</td><td>Banda Aceh / Blang Bintang<br><span class="wsid">0-20000-0-96011</span></td><td>Availability</td><td class="status-closed">Closed (18 Dec 2024)</td></tr>
+                            <tr><td>15</td><td>21 Nov 2024</td><td>All variables &mdash; Exp: 24, Recv: 8</td><td>Lhokseumawe / Malikussaleh<br><span class="wsid">0-20000-0-96009</span></td><td>Availability</td><td class="status-closed">Closed (18 Dec 2024)</td></tr>
+                            <tr><td>16</td><td>21 Nov 2024</td><td>All variables &mdash; Exp: 8, Recv: 24</td><td>Meulaboh / Cut Nyak Dhien<br><span class="wsid">0-20000-0-96015</span></td><td>Availability</td><td class="status-closed">Closed (18 Dec 2024)</td></tr>
+                            <tr><td>17</td><td>21 Nov 2024</td><td>All variables &mdash; Exp: 24, Recv: 8</td><td>Kualanamu Medan<br><span class="wsid">0-20000-0-96035</span></td><td>Availability</td><td class="status-closed">Closed (18 Dec 2024)</td></tr>
+                            <tr><td>18</td><td>21 Nov 2024</td><td>All variables &mdash; Exp: 24, Recv: 8</td><td>Sibolga / Pinangsori<br><span class="wsid">0-20000-0-96073</span></td><td>Availability</td><td class="status-closed">Closed (18 Dec 2024)</td></tr>
+                            <tr><td>19</td><td>21 Nov 2024</td><td>All variables &mdash; Exp: 8, Recv: 24</td><td>Gunung Sitoli / Binaka<br><span class="wsid">0-20000-0-96075</span></td><td>Availability</td><td class="status-closed">Closed (18 Dec 2024)</td></tr>
+                            <tr><td>20</td><td>21 Nov 2024</td><td>All variables &mdash; Exp: 24, Recv: 8</td><td>Mia Padang<br><span class="wsid">0-20000-0-96163</span></td><td>Availability</td><td class="status-closed">Closed (18 Dec 2024)</td></tr>
+                            <tr><td>21</td><td>21 Nov 2024</td><td>All variables &mdash; Exp: 24, Recv: 8</td><td>Pekanbaru / Simpang Tiga<br><span class="wsid">0-20000-0-96109</span></td><td>Availability</td><td class="status-closed">Closed (18 Dec 2024)</td></tr>
+                            <tr><td>22</td><td>21 Nov 2024</td><td>All variables &mdash; Exp: 24, Recv: 8</td><td>Rengat / Japura<br><span class="wsid">0-20000-0-96171</span></td><td>Availability</td><td class="status-closed">Closed (18 Dec 2024)</td></tr>
+                            <tr><td>23</td><td>21 Nov 2024</td><td>All variables &mdash; Exp: 24, Recv: 8</td><td>Tanjung Pinang / Kijang<br><span class="wsid">0-20000-0-96091</span></td><td>Availability</td><td class="status-closed">Closed (18 Dec 2024)</td></tr>
+                            <tr><td>24</td><td>22 Nov 2024</td><td>All variables &mdash; Exp: 24, Recv: 5</td><td>Labuha / Oesma Sadik<br><span class="wsid">0-20000-0-97460</span></td><td>Availability</td><td class="status-closed">Closed (29 Nov 2024)</td></tr>
+                            <tr><td>25</td><td>22 Nov 2024</td><td>All variables &mdash; Exp: 24, Recv: 15</td><td>Ambon / Pattimura<br><span class="wsid">0-20000-0-97724</span></td><td>Availability</td><td class="status-closed">Closed (29 Nov 2024)</td></tr>
+                            <tr><td>26</td><td>22 Nov 2024</td><td>All variables &mdash; Exp: 24, Recv: 10</td><td>Biak / Frans Kaisiepo<br><span class="wsid">0-20000-0-97560</span></td><td>Availability</td><td class="status-closed">Closed (29 Nov 2024)</td></tr>
+                            <tr><td>27</td><td>22 Nov 2024</td><td>All variables &mdash; Exp: 24, Recv: 11</td><td>Kaimana / Utarom<br><span class="wsid">0-20000-0-97760</span></td><td>Availability</td><td class="status-closed">Closed (29 Nov 2024)</td></tr>
+                            <tr><td>28</td><td>22 Nov 2024</td><td>All variables &mdash; Exp: 24, Recv: 1</td><td>Tual / Dumaturbun<br><span class="wsid">0-20000-0-97810</span></td><td>Availability</td><td class="status-closed">Closed (29 Nov 2024)</td></tr>
+                            <tr><td>29</td><td>22 Nov 2024</td><td>All variables &mdash; Exp: 24, Recv: 17</td><td>Saumlaki / Olilit<br><span class="wsid">0-20000-0-97900</span></td><td>Availability</td><td class="status-closed">Closed (29 Nov 2024)</td></tr>
+                            <tr><td>30</td><td>22 Nov 2024</td><td>All variables &mdash; Exp: 24, Recv: 9</td><td>Jayapura / Sentani<br><span class="wsid">0-20000-0-97690</span></td><td>Availability</td><td class="status-closed">Closed (29 Nov 2024)</td></tr>
+                            <tr><td>31</td><td>22 Nov 2024</td><td>All variables &mdash; Exp: 24, Recv: 7</td><td>Tanah Merah<br><span class="wsid">0-20000-0-97876</span></td><td>Availability</td><td class="status-closed">Closed (29 Nov 2024)</td></tr>
+                            <tr><td>32</td><td>22 Nov 2024</td><td>All variables &mdash; Exp: 24, Recv: 16</td><td>Merauke / Mopah<br><span class="wsid">0-20000-0-97980</span></td><td>Availability</td><td class="status-closed">Closed (29 Nov 2024)</td></tr>
+                            <tr><td>33</td><td>22 Nov 2024</td><td>All variables &mdash; Exp: 24, Recv: 9</td><td>Deo Sorong<br><span class="wsid">0-20000-0-97502</span></td><td>Availability</td><td class="status-closed">Closed (29 Nov 2024)</td></tr>
+                            <tr><td>34</td><td>22 Nov 2024</td><td>All variables &mdash; Exp: 8, Recv: 2</td><td>Serui / Sujarwo Condro Negoro<br><span class="wsid">0-20000-0-97570</span></td><td>Availability</td><td class="status-open">Open (red node)</td></tr>
+                            <tr><td>35</td><td>22 Nov 2024</td><td>All variables &mdash; Exp: 8, Recv: 16</td><td>Galela / Gamar Malam<br><span class="wsid">0-20000-0-97570</span></td><td>Availability</td><td class="status-closed">Closed (29 Nov 2024)</td></tr>
+                            <tr><td>36</td><td>24 Dec 2024</td><td>All variables &mdash; Exp: 8, Recv: 5</td><td>Geser<br><span class="wsid">0-20000-0-97748</span></td><td>Availability</td><td class="status-open">Open (orange node)</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </details>
+
+            <details class="report-accordion">
+                <summary><span class="acc-title">Malaysia</span><span class="acc-count">15 tickets</span></summary>
+                <div class="report-table-wrap">
+                    <table class="report-table">
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>Date issue raised</th>
+                                <th>Variable(s) with issues</th>
+                                <th>Station / WIGOS ID</th>
+                                <th>Category</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>1</td><td>12 Aug 2024</td><td>All variables &mdash; Exp: 24, Recv: 0</td><td>Butterworth<br><span class="wsid">0-20000-0-48602</span></td><td>Availability</td><td class="status-closed">Closed (18 Oct 2024)</td></tr>
+                            <tr><td>2</td><td>12 Aug 2024</td><td>All variables &mdash; Exp: 13, Recv: 0</td><td>Cameron Highlands<br><span class="wsid">0-20000-0-48632</span></td><td>Availability</td><td class="status-closed">Closed (18 Oct 2024)</td></tr>
+                            <tr><td>3</td><td>12 Aug 2024</td><td>Relative humidity &mdash; Exp: 8, Recv: 0</td><td>Tanah Rata<br><span class="wsid">0-20008-0-TAR</span></td><td>Availability</td><td class="status-open">Open (black node)</td></tr>
+                            <tr><td>4</td><td>12 Aug 2024</td><td>Surface pressure, zonal &amp; meridional wind, RH &mdash; Exp: 8, Recv: 0</td><td>Gong Kedak<br><span class="wsid">0-458-0-48617</span></td><td>Availability</td><td class="status-closed">Closed (18 Oct 2024)</td></tr>
+                            <tr><td>5</td><td>12 Aug 2024</td><td>All variables &mdash; Exp: 8, Recv: 0</td><td>Kuala Pilah<br><span class="wsid">0-458-0-48651</span></td><td>Availability</td><td class="status-open">Open (black node)</td></tr>
+                            <tr><td>6</td><td>12 Aug 2024</td><td>All variables &mdash; Exp: 24, Recv: 0</td><td>Mersing<br><span class="wsid">0-20000-0-48674</span></td><td>Availability</td><td class="status-open">Open (black node)</td></tr>
+                            <tr><td>7</td><td>16 Sep 2024</td><td>All variables &mdash; Exp: 8, Recv: 0</td><td>Kerteh<br><span class="wsid">0-458-0-48614</span></td><td>Availability</td><td class="status-open">Open (black node)</td></tr>
+                            <tr><td>8</td><td>16 Sep 2024</td><td>All variables &mdash; Exp: 8, Recv: 0</td><td>Mukah<br><span class="wsid">0-458-0-96451</span></td><td>Availability</td><td class="status-open">Open (black node)</td></tr>
+                            <tr><td>9</td><td>16 Sep 2024</td><td>Surface pressure, temperature, zonal &amp; meridional wind &mdash; Exp: 8, Recv: 0</td><td>Mulu<br><span class="wsid">0-458-0-96448</span></td><td>Availability</td><td class="status-open">Open (black node)</td></tr>
+                            <tr><td>10</td><td>16 Sep 2024</td><td>Surface pressure, temperature, zonal &amp; meridional wind &mdash; Exp: 8, Recv: 0</td><td>Ranau<br><span class="wsid">0-458-0-96469</span></td><td>Availability</td><td class="status-open">Open (black node)</td></tr>
+                            <tr><td>11</td><td>24 Sep 2024</td><td>All variables &mdash; Exp: 48, Recv: 24</td><td>Penang / Bayan<br><span class="wsid">0-20000-0-48601</span></td><td>Availability</td><td class="status-open">Open (orange node)</td></tr>
+                            <tr><td>12</td><td>24 Sep 2024</td><td>All variables &mdash; Exp: 48, Recv: 24</td><td>Kinabalu<br><span class="wsid">0-20000-0-96471</span></td><td>Availability</td><td class="status-open">Open (orange node)</td></tr>
+                            <tr><td>13</td><td>24 Sep 2024</td><td>All variables &mdash; Exp: 8, Recv: 24</td><td>Kapit<br><span class="wsid">0-458-0-96420</span></td><td>Availability</td><td class="status-open">Open (pink node)</td></tr>
+                            <tr><td>14</td><td>24 Sep 2024</td><td>All variables &mdash; Exp: 8, Recv: 24</td><td>Limbang<br><span class="wsid">0-458-0-96450</span></td><td>Availability</td><td class="status-closed">Closed (7 Jan 2025)</td></tr>
+                            <tr><td>15</td><td>24 Sep 2024</td><td>All variables &mdash; Exp: 8, Recv: 24</td><td>Keningau<br><span class="wsid">0-458-0-96467</span></td><td>Availability</td><td class="status-closed">Closed (7 Jan 2025)</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </details>
+
+            <details class="report-accordion">
+                <summary><span class="acc-title">Philippines</span><span class="acc-count">8 tickets</span></summary>
+                <div class="report-table-wrap">
+                    <table class="report-table">
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>Date issue raised</th>
+                                <th>Variable(s) with issues</th>
+                                <th>Station / WIGOS ID</th>
+                                <th>Category</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>1</td><td>26 Feb 2024</td><td>All variables &mdash; Exp: 17, Recv: 8</td><td>Laoag<br><span class="wsid">0-20000-0-98223</span></td><td>Availability</td><td class="status-open">Open (orange node)</td></tr>
+                            <tr><td>2</td><td>27 Feb 2024</td><td>All variables &mdash; Exp: 24, Recv: 0 (station closed since 1 Dec 2023)</td><td>Manila<br><span class="wsid">0-20000-0-98425</span></td><td>Availability</td><td class="status-closed">Closed (1 Mar 2024)</td></tr>
+                            <tr><td>3</td><td>28 Feb 2024</td><td>All variables &mdash; Exp: 7, Recv: 0</td><td>Hinatuan<br><span class="wsid">0-20000-0-98755</span></td><td>Availability</td><td class="status-open">Open (black node)</td></tr>
+                            <tr><td>4</td><td>4 Mar 2024</td><td>Relative humidity &mdash; Exp: 8, Recv: 0 (dry bulb thermometer damaged)</td><td>Cuyo<br><span class="wsid">0-20000-0-98630</span></td><td>Availability</td><td class="status-closed">Closed (4 Jun 2024)</td></tr>
+                            <tr><td>5</td><td>28 Mar 2024</td><td>All variables &mdash; Exp: 8, Recv: 2</td><td>Coron<br><span class="wsid">0-20000-0-98526</span></td><td>Availability</td><td class="status-open">Open (orange node)</td></tr>
+                            <tr><td>6</td><td>3 Jun 2024</td><td>All variables &mdash; Exp: 24, Recv: 0</td><td>Manila<br><span class="wsid">0-20000-0-98425</span></td><td>Availability</td><td class="status-closed">Closed (24 Jun 2024)</td></tr>
+                            <tr><td>7</td><td>4 Jun 2024</td><td>All variables &mdash; Exp: 8, Recv: 6</td><td>Dipolog<br><span class="wsid">0-20000-0-98741</span></td><td>Availability</td><td class="status-open">Open (black node)</td></tr>
+                            <tr><td>8</td><td>16 Sep 2024</td><td>All variables &mdash; Exp: 24, Recv: 8</td><td>Mactan<br><span class="wsid">0-20000-0-98646</span></td><td>Availability</td><td class="status-open">Open (orange node)</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </details>
+
+            <details class="report-accordion">
+                <summary><span class="acc-title">Brunei</span><span class="acc-count">1 ticket</span></summary>
+                <div class="report-table-wrap">
+                    <table class="report-table">
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>Date issue raised</th>
+                                <th>Variable(s) with issues</th>
+                                <th>Station / WIGOS ID</th>
+                                <th>Category</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>1</td><td>24 Oct 2024</td><td>All variables &mdash; Exp: 48, Recv: 7</td><td>Brunei<br><span class="wsid">0-20000-0-96315</span></td><td>Availability</td><td class="status-open">Open (red node)</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </details>
+
+            <details class="report-accordion">
+                <summary><span class="acc-title">United States</span><span class="acc-count">6 tickets</span></summary>
+                <div class="report-table-wrap">
+                    <table class="report-table">
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>Date issue raised</th>
+                                <th>Variable(s) with issues</th>
+                                <th>Station / WIGOS ID</th>
+                                <th>Category</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>1</td><td>3 Jul 2024</td><td>All variables &mdash; Exp: 24, Recv: 16</td><td>Honolulu, Oahu, Hawaii<br><span class="wsid">0-20000-0-91182</span></td><td>Availability</td><td class="status-open">Open (orange node)</td></tr>
+                            <tr><td>2</td><td>3 Jul 2024</td><td>All variables &mdash; Exp: 24, Recv: 16</td><td>Hilo HI, Hawaii<br><span class="wsid">0-20000-0-91285</span></td><td>Availability</td><td class="status-open">Open (orange node)</td></tr>
+                            <tr><td>3</td><td>8 Jul 2024</td><td>All variables &mdash; Exp: 24, Recv: 16</td><td>Weather Forecast Office, Guam, Mariana Is.<br><span class="wsid">0-20000-0-91212</span></td><td>Availability</td><td class="status-open">Open (orange node)</td></tr>
+                            <tr><td>4</td><td>8 Jul 2024</td><td>All variables &mdash; Exp: 8, Recv: 4</td><td>Pago Pago / Int. Airp. American Samoa<br><span class="wsid">0-20000-0-91765</span></td><td>Availability</td><td class="status-open">Open (orange node)</td></tr>
+                            <tr><td>5</td><td>1 Oct 2024</td><td>All variables &mdash; Exp: 24, Recv: 16</td><td>Lihue<br><span class="wsid">0-20000-0-91165</span></td><td>Availability</td><td class="status-open">Open (orange node)</td></tr>
+                            <tr><td>6</td><td>10 Oct 2024</td><td>All variables &mdash; Exp: 24, Recv: 16</td><td>Kahului Airport<br><span class="wsid">0-20000-0-91190</span></td><td>Availability</td><td class="status-open">Open (orange node)</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </details>
+
+            <p class="agenda-note">Note: each country block above reproduces that country's rows from the source
+                document. For the exact node-color legend and figure layouts, refer to the original PDF.</p>
+
+            <h4>Table 2 &mdash; Tickets created at IMS regarding upper-air observations in 2024</h4>
+            <div class="report-table-wrap">
+                <table class="report-table">
+                    <caption>Table 2. Upper-air observations &mdash; 14 tickets across 5 countries</caption>
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Date issue raised</th>
+                            <th>Issue(s)</th>
+                            <th>Station / WIGOS ID</th>
+                            <th>Country</th>
+                            <th>Category</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="section-row"><td colspan="7">Indonesia</td></tr>
+                        <tr><td>1</td><td>26 Feb 2024</td><td>Exp: 24, Recv: 0 &mdash; upper-air observations only once a week on Wednesdays</td><td>Ternate / Babullah<br><span class="wsid">0-20000-0-97430</span></td><td>Indonesia</td><td>Availability</td><td class="status-closed">Closed (8 Mar 2024)</td></tr>
+                        <tr><td>2</td><td>10 Jul 2024</td><td>Balikpapan station is not included in the GBON stations for upper air; OSCAR metadata needs correction</td><td>Balikpapan / Sepinggan<br><span class="wsid">0-20000-0-96633</span></td><td>Indonesia</td><td>Availability</td><td class="status-closed">Closed (3 Jan 2025)</td></tr>
+                        <tr><td>3</td><td>29 Jul 2024</td><td>Pekanbaru station not included in GBON upper-air stations; OSCAR metadata needs correction</td><td>Pekanbaru / Simpang Tiga<br><span class="wsid">0-20000-0-96109</span></td><td>Indonesia</td><td>Availability</td><td class="status-open">Open (black node)</td></tr>
+                        <tr><td>4</td><td>23 Sep 2024</td><td>Exp: 2, Recv: 0 &mdash; Meisei transmitter not yet available</td><td>Kualanamu Medan<br><span class="wsid">0-20000-0-96035</span></td><td>Indonesia</td><td>Availability</td><td class="status-wont">Won't Fix (black node)</td></tr>
+                        <tr><td>5</td><td>23 Sep 2024</td><td>Exp: 2, Recv: 0 &mdash; Meisei transmitter not yet available</td><td>Pontianak / Supadio<br><span class="wsid">0-20000-0-96581</span></td><td>Indonesia</td><td>Availability</td><td class="status-wont">Won't Fix (black node)</td></tr>
+                        <tr><td>6</td><td>23 Sep 2024</td><td>Exp: 2, Recv: 0 &mdash; Meisei transmitter not yet available</td><td>Biak / Frans Kaisiepo<br><span class="wsid">0-20000-0-97560</span></td><td>Indonesia</td><td>Availability</td><td class="status-wont">Won't Fix (black node)</td></tr>
+                        <tr><td>7</td><td>23 Sep 2024</td><td>Exp: 2, Recv: 0 &mdash; Meisei transmitter not yet available</td><td>Merauke / Mopah<br><span class="wsid">0-20000-0-97980</span></td><td>Indonesia</td><td>Availability</td><td class="status-wont">Won't Fix (black node)</td></tr>
+                        <tr><td>8</td><td>23 Sep 2024</td><td>Exp: 2, Recv: 0 &mdash; Meisei transmitter not yet available</td><td>Bengkulu / Padang Kemiling<br><span class="wsid">0-20000-0-96253</span></td><td>Indonesia</td><td>Availability</td><td class="status-wont">Won't Fix (black node)</td></tr>
+
+                        <tr class="section-row"><td colspan="7">Malaysia</td></tr>
+                        <tr><td>1</td><td>24 Sep 2024</td><td>Exp: 2, Recv: 1</td><td>Bintulu<br><span class="wsid">0-20000-0-96441</span></td><td>Malaysia</td><td>Availability</td><td class="status-open">Open (orange node)</td></tr>
+                        <tr><td>2</td><td>24 Sep 2024</td><td>Exp: 2, Recv: 1</td><td>Tawau<br><span class="wsid">0-20000-0-96481</span></td><td>Malaysia</td><td>Availability</td><td class="status-open">Open (orange node)</td></tr>
+
+                        <tr class="section-row"><td colspan="7">Philippines</td></tr>
+                        <tr><td>1</td><td>5 Mar 2024</td><td>Exp: 24, Recv: 0 &mdash; Lack of hydrogen supply for the balloons</td><td>Legaspi<br><span class="wsid">0-20000-0-98444</span></td><td>Philippines</td><td>Availability</td><td class="status-closed">Closed (13 Feb 2025)</td></tr>
+                        <tr><td>2</td><td>24 Sep 2024</td><td>Exp: 2, Recv: 0</td><td>Mactan<br><span class="wsid">0-20000-0-98646</span></td><td>Philippines</td><td>Availability</td><td class="status-wont">Won't Fix</td></tr>
+
+                        <tr class="section-row"><td colspan="7">Brunei</td></tr>
+                        <tr><td>1</td><td>24 Sep 2024</td><td>Exp: 2, Recv: 0</td><td>Brunei Airport<br><span class="wsid">0-20000-0-96315</span></td><td>Brunei</td><td>Availability</td><td class="status-open">Open (black node)</td></tr>
+
+                        <tr class="section-row"><td colspan="7">United States</td></tr>
+                        <tr><td>1</td><td>1 Oct 2024</td><td>Exp: 2, Recv: 1</td><td>Pago<br><span class="wsid">0-20000-0-91765</span></td><td>United States</td><td>Availability</td><td class="status-open">Open (orange node)</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>III. WIGOS Metadata Management</h3>
+            <p>During 2024 there were <strong>2 issues related to WIGOS metadata</strong>, summarised in Table 3 below.</p>
+
+            <div class="report-table-wrap">
+                <table class="report-table">
+                    <caption>Table 3. Issues regarding WIGOS metadata</caption>
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Date</th>
+                            <th>Details of metadata issues</th>
+                            <th>Station / WIGOS ID</th>
+                            <th>Country</th>
+                            <th>Network</th>
+                            <th>Corrective actions taken</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>26 Feb 2024</td>
+                            <td>Surface pressure, temperature, zonal &amp; meridional wind, RH &mdash; Exp: 17, Recv: 8</td>
+                            <td>Laoag<br><span class="wsid">0-20000-0-98223</span></td>
+                            <td>Philippines</td>
+                            <td>Surface availability</td>
+                            <td>Suggestion to NFP Philippines to update OSCAR metadata of Laoag station &mdash; specifically operation hours to 3 hours.</td>
+                            <td class="status-open">Open</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>26 Feb 2024</td>
+                            <td>Exp: 24, Recv: 0 &mdash; upper-air observations only once a week on Wednesdays</td>
+                            <td>Ternate / Babullah<br><span class="wsid">0-20000-0-97430</span></td>
+                            <td>Indonesia</td>
+                            <td>Upper-air availability</td>
+                            <td>Checking the operating hours.</td>
+                            <td class="status-closed">Closed (8 Mar 2024)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>IV. Conclusion</h3>
+            <ul class="bullet">
+                <li>Overall, there were <strong>82 issues</strong> related to surface land observations, upper-air
+                    observations, and WIGOS metadata, broken down as follows:
+                    <ul class="bullet" style="margin-top:.5rem;">
+                        <li>Surface land observations: <strong>66 issues</strong></li>
+                        <li>Upper-air observations: <strong>14 issues</strong></li>
+                        <li>WIGOS metadata: <strong>2 issues</strong></li>
+                    </ul>
+                </li>
+                <li>Issues in Brunei and Papua New Guinea have not been recorded in IMS because the NFP is not yet
+                    available.</li>
+                <li>Several things still need to be developed, such as automation in the calculation of issues that
+                    have been created.</li>
+                <li>Regular meetings with the NFPs of all countries are still needed.</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- ========== FOOTER ========== -->
+    <footer id="contact">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <img src="/logo-update.svg" alt="RWC Indonesia">
+                    <p>Regional WIGOS Centre Indonesia — A regional centre for implementing the WMO Integrated Global
+                        Observing System (WIGOS) across the RA-V region, operated by BMKG.</p>
+                    <div class="footer-social">
+                        <a href="https://twitter.com/infoBMKG" target="_blank" aria-label="Twitter"><i
+                                class="fab fa-x-twitter"></i></a>
+                        <a href="https://www.instagram.com/infobmkg" target="_blank" aria-label="Instagram"><i
+                                class="fab fa-instagram"></i></a>
+                        <a href="https://www.youtube.com/user/infoBMKG" target="_blank" aria-label="YouTube"><i
+                                class="fab fa-youtube"></i></a>
+                        <a href="https://www.facebook.com/infoBMKG" target="_blank" aria-label="Facebook"><i
+                                class="fab fa-facebook-f"></i></a>
+                    </div>
+                    <div class="footer-partners">
+                        <img src="/assets/logowmo.png" alt="WMO">
+                        <img src="/assets/logo-bmkg.webp" alt="BMKG">
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Navigation</h4>
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/#about">About Us</a></li>
+                        <li><a href="/#dashboards">Dashboards</a></li>
+                        <li><a href="/#services">Services</a></li>
+                        <li><a href="/activities">Activities</a></li>
+                        <li><a href="/reports">Reports</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>WIGOS Services</h4>
+                    <ul>
+                        <li><a href="https://oscar.wmo.int/surface/" target="_blank">OSCAR/Surface</a></li>
+                        <li><a href="https://wdqms.wmo.int/" target="_blank">WDQMS Monitoring</a></li>
+                        <li><a href="https://community.wmo.int/activity-areas/wigos" target="_blank">WIGOS Technical
+                                Info</a></li>
+                        <li><a href="https://jira.wmo.int/" target="_blank">WMO Global Jira</a></li>
+                        <li><a href="/monitoring/report.html">Regional Summary</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Contact</h4>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt" style="color:var(--accent);margin-right:6px;"></i> Jl.
+                            Angkasa I No.2, Kemayoran, Jakarta, Indonesia</li>
+                        <li><i class="fas fa-phone" style="color:var(--accent);margin-right:6px;"></i> +62 21 6546315
+                        </li>
+                        <li><i class="fas fa-envelope" style="color:var(--accent);margin-right:6px;"></i>
+                            inarwc@bmkg.go.id
+                        </li>
+                        <li><i class="fas fa-globe" style="color:var(--accent);margin-right:6px;"></i> wmo.int/wigos
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                &copy; 2026 RWC Indonesia — BMKG | WMO Integrated Global Observing System. All Rights Reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script src="/script.js"></script>
+</body>
+
+</html>

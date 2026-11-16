@@ -1,0 +1,63 @@
+# =============================================================
+# rwc-v2 — monorepo RWC Indonesia
+# =============================================================
+
+# --- Secrets -------------------------------------------------
+.env
+*.env
+!*.env.example
+config.env
+server/.env
+
+# --- Dependencies ---------------------------------------------
+node_modules/
+.pnpm-store/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.ruff_cache/
+.mypy_cache/
+.pytest_cache/
+*.egg-info/
+
+# --- Build output ---------------------------------------------
+.next/
+out/
+dist/
+build/
+*.tsbuildinfo
+
+# --- Cache & logs ---------------------------------------------
+*.log
+logs/
+cache/
+.pm2/
+charts/
+
+# --- Generated / database -------------------------------------
+*.db
+*.sqlite
+*.sqlite3
+# Snapshot hasil scraping Jira WMO (data tiket operasional, bukan kode).
+# Dibuat ulang oleh server/scrape.js saat runtime.
+jira-ticket-v2/issues.json
+
+# --- Aset besar (deploy manual via scp/rsync) -----------------
+# materi training 421 MB, termasuk satu pptx 111 MB yang
+# melebihi batas 100 MB/file GitHub.
+landingpage/assets/materi/
+# laporan PDF 58 MB (64 file)
+landingpage/assets/REPORT/
+
+# --- OS / editor ----------------------------------------------
+.DS_Store
+Thumbs.db
+*.swp
+*.bak
+*~
+.idea/
+.vscode/
+
+# --- Command Code ---------------------------------------------
+.commandcode/

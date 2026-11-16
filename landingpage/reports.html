@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="RWC Indonesia Reports — Yearly and monthly monitoring reports of RWC Indonesia covering WDQMS monitoring, IMS tickets, and WIGOS metadata management across WMO Region V.">
+    <title>Reports — RWC Indonesia</title>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="icon" href="/logo-update.svg" type="image/svg+xml">
+    <style>
+        .page-hero { padding: 9rem 0 2rem; text-align: center; }
+        .content-section { padding: 1rem 0 6rem; }
+        .report-list { max-width: 640px; margin: 0 auto; }
+        .report-year { margin-bottom: 1rem; }
+        .report-year > summary {
+            list-style: none; cursor: pointer;
+            font-size: 1.4rem; font-weight: 700; color: var(--primary);
+            padding-bottom: .4rem; margin-bottom: 0;
+            display: flex; align-items: baseline; gap: .5rem;
+        }
+        .report-year > summary::-webkit-details-marker { display: none; }
+        .report-year > summary::after {
+            content: "\f054"; font-family: "Font Awesome 6 Free"; font-weight: 900;
+            font-size: .85rem; color: var(--accent);
+            transition: transform .2s ease; margin-left: .15rem;
+        }
+        .report-year[open] > summary::after { content: "\f077"; }
+        .report-items { list-style: none; padding: .5rem 0 0 1rem; margin: 0; }
+        .report-items li {
+            display: flex; align-items: baseline; gap: .6rem;
+            padding: .35rem 0; font-size: .95rem; line-height: 1.7;
+        }
+        .report-items li .ri-label { flex: 1; color: var(--gray-700); }
+        .report-items li .ri-label.unavailable { color: var(--gray-500); opacity: .6; }
+        .report-items li a {
+            color: var(--accent); font-size: .82rem; font-weight: 600;
+            text-decoration: none; white-space: nowrap;
+        }
+        .report-items li a:hover { text-decoration: underline; }
+        .report-items li a + a { margin-left: .9rem; }
+        .report-items li.yearly { margin-top: .75rem; padding-top: .6rem; border-top: 1px dashed rgba(19,49,95,.10); }
+        .report-items li.yearly .ri-label { font-weight: 600; color: var(--primary-dark); }
+        .loading-note { text-align: center; color: var(--gray-500); padding: 2rem 0; }
+    </style>
+</head>
+
+<body>
+
+    <!-- ========== HEADER ========== -->
+    <header id="header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="/" class="nav-brand">
+                    <img src="/logo-update.svg" alt="RWC Indonesia Logo">
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a href="/">Home</a>
+                    <a href="/#dashboards">Dashboards</a>
+                    <a href="/#about">About</a>
+                    <a href="/#services">Services</a>
+                    <a href="/activities">Activities</a>
+                    <a href="/reports" class="active">Reports</a>
+                    <a href="/#contact" class="nav-cta">Contact</a>
+                </div>
+                <button class="hamburger" id="hamburger" aria-label="Menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ========== PAGE HERO ========== -->
+    <section class="page-hero">
+        <div class="container">
+            <div class="section-title animate-on-scroll">
+                <h2>Reports</h2>
+                <p>Yearly and monthly monitoring reports of Regional WIGOS Centre Indonesia (RWC Indonesia) documenting
+                    WDQMS monitoring activities, IMS ticket handling, and WIGOS metadata management across WMO Region V
+                    member countries.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== REPORT LIST (dinamis dari /api/reports/index) ========== -->
+    <section class="content-section">
+        <div class="container">
+            <div class="report-list" id="reportList">
+                <p class="loading-note"><i class="fas fa-spinner fa-spin"></i> Loading reports…</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== FOOTER ========== -->
+    <footer id="contact">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <img src="/logo-update.svg" alt="RWC Indonesia">
+                    <p>Regional WIGOS Centre Indonesia — A regional centre for implementing the WMO Integrated Global
+                        Observing System (WIGOS) across the RA-V region, operated by BMKG.</p>
+                    <div class="footer-social">
+                        <a href="https://twitter.com/infoBMKG" target="_blank" aria-label="Twitter"><i
+                                class="fab fa-x-twitter"></i></a>
+                        <a href="https://www.instagram.com/infobmkg" target="_blank" aria-label="Instagram"><i
+                                class="fab fa-instagram"></i></a>
+                        <a href="https://www.youtube.com/user/infoBMKG" target="_blank" aria-label="YouTube"><i
+                                class="fab fa-youtube"></i></a>
+                        <a href="https://www.facebook.com/infoBMKG" target="_blank" aria-label="Facebook"><i
+                                class="fab fa-facebook-f"></i></a>
+                    </div>
+                    <div class="footer-partners">
+                        <img src="/assets/logowmo.png" alt="WMO">
+                        <img src="/assets/logo-bmkg.webp" alt="BMKG">
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Navigation</h4>
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/#about">About Us</a></li>
+                        <li><a href="/#dashboards">Dashboards</a></li>
+                        <li><a href="/#services">Services</a></li>
+                        <li><a href="/activities">Activities</a></li>
+                        <li><a href="/reports">Reports</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>WIGOS Services</h4>
+                    <ul>
+                        <li><a href="https://oscar.wmo.int/surface/" target="_blank">OSCAR/Surface</a></li>
+                        <li><a href="https://wdqms.wmo.int/" target="_blank">WDQMS Monitoring</a></li>
+                        <li><a href="https://community.wmo.int/activity-areas/wigos" target="_blank">WIGOS Technical
+                                Info</a></li>
+                        <li><a href="https://jira.wmo.int/" target="_blank">WMO Global Jira</a></li>
+                        <li><a href="/monitoring/report.html">Regional Summary</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Contact</h4>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt" style="color:var(--accent);margin-right:6px;"></i> Jl.
+                            Angkasa I No.2, Kemayoran, Jakarta, Indonesia</li>
+                        <li><i class="fas fa-phone" style="color:var(--accent);margin-right:6px;"></i> +62 21 6546315
+                        </li>
+                        <li><i class="fas fa-envelope" style="color:var(--accent);margin-right:6px;"></i>
+                            inarwc@bmkg.go.id
+                        </li>
+                        <li><i class="fas fa-globe" style="color:var(--accent);margin-right:6px;"></i> wmo.int/wigos
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                &copy; 2026 RWC Indonesia — BMKG | WMO Integrated Global Observing System. All Rights Reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script src="/script.js"></script>
+    <script>
+        (function () {
+            const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'];
+
+            const list = document.getElementById('reportList');
+
+            function renderEmpty(msg) {
+                list.innerHTML = `<p class="loading-note">${msg}</p>`;
+            }
+
+            function render(data) {
+                if (!data.years || data.years.length === 0) {
+                    return renderEmpty('No reports available yet.');
+                }
+                list.innerHTML = data.years.map(y => {
+                    const monthsMap = y.months || {};
+                    const monthRows = MONTH_NAMES.map((name, i) => {
+                        const mm = String(i + 1).padStart(2, '0');
+                        const langs = monthsMap[mm];
+                        if (langs && langs.length) {
+                            const links = langs.map(lang =>
+                                `<a href="/assets/REPORT/${y.year}/${lang}/${mm}-${name.toLowerCase()}.pdf" target="_blank" rel="noopener">${lang}</a>`
+                            ).join('');
+                            return `<li>
+                                <span class="ri-label">${name} ${y.year}</span>
+                                ${links}
+                            </li>`;
+                        }
+                        return `<li><span class="ri-label unavailable">${name} ${y.year}</span></li>`;
+                    }).join('');
+
+                    let yearlyRow;
+                    const yLangs = y.yearlyPdfLangs || [];
+                    if (y.hasYearly || yLangs.length) {
+                        const actions = [];
+                        if (y.hasYearly) {
+                            actions.push(`<a href="/reports/${y.year}/yearly">Details</a>`);
+                        }
+                        yLangs.forEach(lang => {
+                            actions.push(`<a href="/assets/REPORT/${y.year}/${lang}/13-yearly.pdf" target="_blank" rel="noopener">${lang}</a>`);
+                        });
+                        yearlyRow = `<li class="yearly">
+                            <span class="ri-label">Yearly Report ${y.year}</span>
+                            ${actions.join('')}
+                        </li>`;
+                    } else {
+                        yearlyRow = `<li class="yearly"><span class="ri-label unavailable">Yearly Report ${y.year}</span></li>`;
+                    }
+
+                    return `<details class="report-year">
+                        <summary>${y.year}</summary>
+                        <ul class="report-items">
+                            ${monthRows}
+                            ${yearlyRow}
+                        </ul>
+                    </details>`;
+                }).join('');
+            }
+
+            fetch('/api/reports/index').then(r => r.json()).then(render).catch(() => renderEmpty('Failed to load reports. Please try again later.'));
+        })();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Training on Meteorological Instrument Metadata and WIGOS Tools, 12–16 October 2026 — in-person technical training for DGMET Oman hosted by RWC Indonesia (BMKG).">
+    <title>Training on Meteorological Instrument Metadata and WIGOS Tools — RWC Indonesia</title>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="icon" href="/logo-update.svg" type="image/svg+xml">
+    <style>
+        /* Sub-page specific additions (global theme comes from style.css) */
+        .page-hero { padding: 9rem 0 3rem; text-align: center; }
+        .event-meta-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-top: 2rem; }
+        .event-meta-card { text-align: left; padding: 1.4rem 1.5rem; }
+        .event-meta-card .service-icon { margin: 0 0 .9rem; width: 54px; height: 54px; font-size: 1.35rem; border-radius: 14px; }
+        .event-meta-card small { display: block; text-transform: uppercase; letter-spacing: .08em; font-size: .7rem; font-weight: 700; opacity: .7; margin-bottom: .3rem; }
+        .event-meta-card strong { font-size: .95rem; line-height: 1.6; }
+        @media (max-width: 992px) { .event-meta-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 600px) { .event-meta-grid { grid-template-columns: 1fr; } }
+        .content-section { padding: 3rem 0; }
+        .content-section ul.tick-list { list-style: none; padding: 0; margin: 1rem 0 0; }
+        .content-section ul.tick-list li { margin-bottom: .6rem; line-height: 1.7; }
+        .content-section ul.tick-list li i { color: var(--accent, #2f6fe4); margin-right: .5rem; }
+        .content-section ol.objectives { margin: 1rem 0 0; padding-left: 1.5rem; }
+        .content-section ol.objectives li { margin-bottom: .6rem; line-height: 1.7; }
+        .back-link { display: inline-block; margin-bottom: 1.5rem; font-weight: 700; }
+        /* Agenda tables */
+        /* Agenda accordion (click day header to expand) */
+        .agenda-day { border: 1px solid rgba(19,49,95,.12); border-radius: 16px; margin-bottom: 1.25rem; overflow: hidden; background: #fff; }
+        .agenda-day > summary { list-style: none; cursor: pointer; padding: .9rem 1.25rem; font-weight: 700; background: rgba(47,111,228,.07); display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+        .agenda-day > summary::-webkit-details-marker { display: none; }
+        .agenda-day > summary::after { content: "\f078"; font-family: "Font Awesome 6 Free"; font-weight: 900; font-size: .8rem; }
+        .agenda-day[open] > summary::after { transform: rotate(180deg); }
+        .agenda-day .agenda-table { border: 0; border-radius: 0; margin: 0; }
+        .agenda-table { width: 100%; border-collapse: collapse; font-size: .88rem; background: #fff; border: 1px solid rgba(19,49,95,.12); border-radius: 16px; overflow: hidden; }
+        .agenda-table th { background: rgba(47,111,228,.09); text-align: left; padding: .7rem .9rem; white-space: nowrap; }
+        .agenda-table td { padding: .7rem .9rem; border-top: 1px solid rgba(19,49,95,.1); vertical-align: top; line-height: 1.65; }
+        .agenda-table td:first-child { white-space: nowrap; font-weight: 600; }
+        .agenda-table ul { margin: .3rem 0 0; padding-left: 1.2rem; }
+        .agenda-table li { margin-bottom: .15rem; }
+        .agenda-table tr.break td { background: rgba(19,49,95,.03); color: #64748b; }
+        .agenda-table tr.break td:last-child { background: rgba(19,49,95,.03); }
+        .agenda-table td.mat-col { white-space: nowrap; }
+        .agenda-table a.material-link {
+            display: inline-flex; align-items: center; gap: .35rem;
+            padding: .3rem .6rem; margin: 0 .3rem .3rem 0;
+            border-radius: 7px; font-size: .76rem; font-weight: 700;
+            text-decoration: none; white-space: nowrap;
+            background: rgba(47,111,228,.08); color: var(--accent);
+            border: 1px solid rgba(47,111,228,.18); transition: all .18s ease;
+        }
+        .agenda-table a.material-link:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+        .agenda-table a.material-link i { font-size: .72rem; }
+        .agenda-table a.material-link.pdf { background: rgba(220,38,38,.07); color: #dc2626; border-color: rgba(220,38,38,.2); }
+        .agenda-table a.material-link.pdf:hover { background: #dc2626; color: #fff; border-color: #dc2626; }
+        .agenda-note { font-size: .82rem; opacity: .75; margin-top: 1rem; }
+    </style>
+</head>
+
+<body>
+
+    <!-- ========== HEADER ========== -->
+    <header id="header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="/" class="nav-brand">
+                    <img src="/logo-update.svg" alt="RWC Indonesia Logo">
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a href="/">Home</a>
+                    <a href="/#dashboards">Dashboards</a>
+                    <a href="/#about">About</a>
+                    <a href="/#services">Services</a>
+                    <a href="/activities" class="active">Activities</a>
+                    <a href="/reports">Reports</a>
+                    <a href="/#contact" class="nav-cta">Contact</a>
+                </div>
+                <button class="hamburger" id="hamburger" aria-label="Menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ========== DETAIL ========== -->
+    <section class="page-hero">
+        <div class="container">
+            <a class="back-link" href="/activities/capacity-development"><i class="fas fa-arrow-left"></i> Capacity Development</a>
+            <div class="section-title animate-on-scroll">
+                <h2>Training on Meteorological Instrument Metadata and WIGOS Tools</h2>
+                <p>12 &ndash; 16 October 2026 &middot; 5 days &middot; In-person training for DGMET Oman &middot; Hosted by RWC Indonesia (BMKG), Jakarta</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="content-section">
+        <div class="container">
+            <div class="event-meta-grid">
+                <div class="service-card event-meta-card animate-on-scroll">
+                    <div class="service-icon"><i class="fas fa-calendar-alt"></i></div>
+                    <small>Date</small>
+                    <strong>12 &ndash; 16 October 2026</strong>
+                </div>
+                <div class="service-card event-meta-card animate-on-scroll">
+                    <div class="service-icon"><i class="fas fa-clock"></i></div>
+                    <small>Duration</small>
+                    <strong>5 days</strong>
+                </div>
+                <div class="service-card event-meta-card animate-on-scroll">
+                    <div class="service-icon"><i class="fas fa-location-dot"></i></div>
+                    <small>Location</small>
+                    <strong>Calibration Laboratory, BMKG Headquarter Office, Stamet Soetta &amp; Weather Radar Site</strong>
+                </div>
+                <div class="service-card event-meta-card animate-on-scroll">
+                    <div class="service-icon"><i class="fas fa-users"></i></div>
+                    <small>Participants</small>
+                    <strong>Staff members from Oman (DGMET)</strong>
+                </div>
+                <div class="service-card event-meta-card animate-on-scroll">
+                    <div class="service-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+                    <small>Speakers</small>
+                    <strong>BMKG Team (DDK RWC Indonesia, DJK, DMP, PPSDM, DIK, Stamet Soetta)</strong>
+                </div>
+                <div class="service-card event-meta-card animate-on-scroll">
+                    <div class="service-icon"><i class="fas fa-hand-holding-dollar"></i></div>
+                    <small>Funding</small>
+                    <strong>DGMET Oman</strong>
+                </div>
+            </div>
+
+            <br>
+            <h3>Training Objectives</h3>
+            <ol class="objectives">
+                <li>Strengthen understanding of WIGOS concept, operational workflows and related systems, including OSCAR/Surface, WDQMS, IMS, GBON, RBON and WIS 2.0.</li>
+                <li>Enhance participants&rsquo; capacity in metadata management and WIGOS Station Identifier (WSI) implementation.</li>
+                <li>Develop hands-on operational skills in the use of OSCAR/Surface, WDQMS, and IMS.</li>
+                <li>Improve participants&rsquo; ability to analyze operational monitoring, data quality, and metadata issues.</li>
+                <li>Promote operational collaboration, coordination, and experience sharing among participants.</li>
+                <li>Enhance participants&rsquo; understanding of observation equipment operations, data processing, and practical applications through direct observation and technical discussions.</li>
+            </ol>
+
+            <br>
+            <h3>Expected Learning Outcomes</h3>
+            <p>By the end of the training, participants are expected to be able to:</p>
+            <ol class="objectives">
+                <li>Understand the concept and operational workflow of WIGOS and related systems.</li>
+                <li>Manage, validate and apply WSI standards in OSCAR/Surface.</li>
+                <li>Understand metadata governance and interoperability concepts within the WIGOS framework.</li>
+                <li>Analyze data availability and quality issues using WDQMS.</li>
+                <li>Use IMS for incident management and operational follow-up.</li>
+                <li>Identify operational issues and recommend corrective actions.</li>
+            </ol>
+
+            <br>
+            <h3>Tentative Agenda</h3>
+            <p>All times in WIB. Arrival of the Oman team is tentative prior to Day 1.</p>
+
+            <details class="agenda-day">
+                <summary>Day 1 &mdash; Opening and Introduction</summary>
+            <table class="agenda-table">
+                <tr><th>Time (WIB)</th><th>Topic</th><th>Resource Person</th><th>Materials</th></tr>
+                <tr><td>09.00 &ndash; 09.15</td><td>Opening and Welcome Remarks (15&rsquo;):<ul><li>Welcoming remarks from Deputy Head for Infrastructure Meteorology, Climatology, and Geophysics BMKG</li><li>Remarks from the representative of Oman team</li></ul></td><td><ul><li>Representative of Deputy Head for Infrastructure MKG</li><li>DGMET Oman</li></ul></td><td></td></tr>
+                <tr><td>09.15 &ndash; 09.30</td><td>Overview of the Training Program (15&rsquo;): Training Objectives and Expected Learning Outcomes</td><td>Dr. Regina Yulia Yasmin, MT</td><td></td></tr>
+                <tr class="break"><td>09.30 &ndash; 10.00</td><td>Group Photo and Coffee Break (30&rsquo;)</td><td></td><td></td></tr>
+                <tr><td>10.00 &ndash; 10.10</td><td>Ice Breaking (Pre Test WIGOS &amp; Tools) (10&rsquo;)</td><td><ul><li>Anni Arumsari Fitriany, S.Si, M.E</li><li>Rantifa Eka Agustira, S.Tr. Met</li></ul></td><td></td></tr>
+                <tr><td>10.10 &ndash; 10.25</td><td>1.1 WIGOS Concept: Principles &amp; Implementation (15&rsquo;)</td><td><ul><li>Dr. Regina Yulia Yasmin, MT</li><li>Tri Nurmayati, S.Si, M.AB</li></ul></td><td class="mat-col"><a class="material-link pdf" href="/assets/materi/1.1-1.2-wigos-concept-principles.pdf" download><i class="fas fa-file-pdf"></i>PDF</a></td></tr>
+                <tr><td>10.25 &ndash; 10.55</td><td>1.2 WIGOS Operational Workflow (30&rsquo;):<ul><li>WIGOS Observation and Metadata Workflow</li><li>Integration between WIGOS, OSCAR/Surface, WDQMS, IMS, and WIS 2.0</li></ul></td><td><ul><li>Dr. Regina Yulia Yasmin, MT</li><li>Tri Nurmayati, S.Si, M.AB</li></ul></td><td class="mat-col"><a class="material-link pdf" href="/assets/materi/1.1-1.2-wigos-concept-principles.pdf" download><i class="fas fa-file-pdf"></i>PDF</a></td></tr>
+                <tr><td>10.55 &ndash; 11.25</td><td>1.3 Roles and Responsibilities in WIGOS Implementation (30&rsquo;):<ul><li>Roles &amp; Functions of RWCs</li><li>Experience Sharing of RWC Indonesia in WIGOS Implementation</li></ul></td><td>Dr. Regina Yulia Yasmin, MT</td><td class="mat-col"><a class="material-link pdf" href="/assets/materi/1.3-roles-responsibilities-wigos.pdf" download><i class="fas fa-file-pdf"></i>PDF</a></td></tr>
+                <tr><td>11.25 &ndash; 11.35</td><td>1.4 Quick Exercise: Identifying WSI Structure from Existing Stations (10&rsquo;)</td><td><ul><li>Aby Rengga Saputra, S.T</li><li>Priambudi Huda Firmani, S.Tr, M.Sc</li></ul></td><td></td></tr>
+                <tr class="break"><td>11.35 &ndash; 13.00</td><td>Lunch Break (85&rsquo;)</td><td></td><td></td></tr>
+                <tr><td>13.00 &ndash; 13.45</td><td>1.5 WIGOS Station Identifier (WSI) Modules (45&rsquo;):<ul><li>Concept, Structure and Components</li><li>Allocation Rules and Best Practices</li><li>Implementation in OSCAR/Surface</li></ul></td><td><ul><li>Aby Rengga Saputra, S.T</li><li>Priambudi Huda Firmani, S.Tr, M.Sc</li></ul></td><td class="mat-col"><a class="material-link pdf" href="/assets/materi/1.5-wigos-station-identifiers.pdf" download><i class="fas fa-file-pdf"></i>PDF</a></td></tr>
+                <tr><td>13.45 &ndash; 14.30</td><td>1.6 Introduction to OSCAR/Surface and Metadata Standards (45&rsquo;):<ul><li>Overview of WMO metadata standards</li><li>OSCAR/Surface Features and Architecture</li><li>User Roles and Access Management</li><li>Metadata Governance Principles</li></ul></td><td><ul><li>Aby Rengga Saputra, S.T</li><li>Priambudi Huda Firmani, S.Tr, M.Sc</li></ul></td><td class="mat-col"><a class="material-link pdf" href="/assets/materi/1.6-oscar-surface-metadata-standards.pdf" download><i class="fas fa-file-pdf"></i>PDF</a></td></tr>
+                <tr class="break"><td>14.30 &ndash; 15.00</td><td>Coffee Break (30&rsquo;)</td><td></td><td></td></tr>
+                <tr><td>15.00 &ndash; 16.00</td><td>1.7 Experience Sharing on Metadata Management (60&rsquo;):<ul><li>BMKG</li><li>DGMet Oman</li></ul></td><td><ul><li>Helminah Herawati, S.Si</li><li>Wishnu Agum Swastiko, S.Tr</li><li>DGMET Oman</li></ul></td><td class="mat-col"><a class="material-link pdf" href="/assets/materi/1.7-experience-sharing-bmkg-wishnu.pdf" download><i class="fas fa-file-pdf"></i>PDF</a><a class="material-link pdf" href="/assets/materi/1.7-experience-sharing-metadata-management.pdf" download><i class="fas fa-file-pdf"></i>PDF</a></td></tr>
+                <tr><td>16.00 &ndash; 16.15</td><td>Wrapping Up Day 1</td><td>Dr. Regina Yulia Yasmin, MT</td><td></td></tr>
+            </table>
+            </details>
+
+            <details class="agenda-day">
+                <summary>Day 2 &mdash; OSCAR/Surface</summary>
+            <table class="agenda-table">
+                <tr><th>Time (WIB)</th><th>Topic</th><th>Resource Person</th><th>Materials</th></tr>
+                <tr><td>09.00 &ndash; 09.15</td><td>Review of Day 1 &amp; Introduction to Day 2 (15&rsquo;)</td><td>Dr. Regina Yulia Yasmin, MT</td><td></td></tr>
+                <tr><td>09.15 &ndash; 09.45</td><td>2.1 Metadata Requirements (30&rsquo;):<ul><li>Station and Instrument Metadata Requirements</li><li>Geolocation and Operational Metadata</li><li>Metadata Requirements for Example Marine Observing Systems, Weather Radar, etc.</li></ul></td><td><ul><li>Aby Rengga Saputra, S.T</li><li>Agita Devi Prastiwi, M.Si.</li></ul></td><td class="mat-col"><a class="material-link pdf" href="/assets/materi/2.1-metadata-requirements.pdf" download><i class="fas fa-file-pdf"></i>PDF</a></td></tr>
+                <tr><td>09.45 &ndash; 10.30</td><td>2.2 OSCAR/Surface &amp; Practical Session I (45&rsquo;):<ul><li>User Login and System Navigation</li><li>Creating Test Stations Using Generic Form and Templates</li><li>Registering Instruments and Sensors</li><li>Entering Technical and Operational Metadata</li></ul></td><td><ul><li>Aby Rengga Saputra, S.T</li><li>Sananti Ningsih, ST, M.T</li></ul></td><td class="mat-col"><a class="material-link pdf" href="/assets/materi/2.2-oscar-surface-practical-session-i.pdf" download><i class="fas fa-file-pdf"></i>PDF</a></td></tr>
+                <tr class="break"><td>10.30 &ndash; 10.45</td><td>Coffee Break (15&rsquo;)</td><td></td><td></td></tr>
+                <tr><td>10.45 &ndash; 11.15</td><td>2.3 Using OSCAR/Surface to Retrieve Information (30&rsquo;):<ul><li>Searching and Retrieving Station Information</li><li>Exploring Metadata and Instrument Records</li><li>Filtering Networks and Station Status</li></ul></td><td><ul><li>Sulkhi, S.Tr, M.Si</li><li>Sananti Ningsih, ST, M.T</li></ul></td><td class="mat-col"><a class="material-link pdf" href="/assets/materi/2.3-using-oscar-surface-retrieve-information.pdf" download><i class="fas fa-file-pdf"></i>PDF</a></td></tr>
+                <tr><td>11.15 &ndash; 12.00</td><td>2.4 OSCAR/Surface &amp; Practical Session II (45&rsquo;):<ul><li>Using the Web Client Interfaces</li><li>Updating and Managing Metadata Records</li><li>Managing Operational Status and Affiliations</li><li>Metadata Validation and Change Tracking</li></ul></td><td><ul><li>Priambudi Huda Firmani, S.Tr, M.Sc</li><li>Sulkhi, S.Tr, M.Si</li></ul></td><td class="mat-col"><a class="material-link pdf" href="/assets/materi/2.4-oscar-surface-practical-session-ii.pdf" download><i class="fas fa-file-pdf"></i>PDF</a></td></tr>
+                <tr class="break"><td>12.00 &ndash; 13.30</td><td>Lunch Break (90&rsquo;)</td><td></td><td></td></tr>
+                <tr><td>13.30 &ndash; 14.15</td><td>2.5 Advanced OSCAR/Surface Features (45&rsquo;):<ul><li>Data Exchange and Interoperability Features</li><li>API and Machine-to-Machine Interfaces</li><li>Traceability and Calibration Information</li></ul></td><td><ul><li>Aby Rengga Saputra, S.T</li><li>Hendra Setiaji, S.Tr.Inst.</li></ul></td><td class="mat-col"><a class="material-link pdf" href="/assets/materi/2.5-oscar-surface-advanced-m2m.pdf" download><i class="fas fa-file-pdf"></i>PDF</a></td></tr>
+                <tr><td>14.15 &ndash; 14.45</td><td>2.6 Analysis of National Observing Network in OSCAR/Surface (30&rsquo;):<ul><li>Reviewing Participants&rsquo; National Observing Networks</li><li>Identifying Metadata Gaps and Inconsistencies</li><li>Assessing Network Coverage and Operational Status</li></ul></td><td><ul><li>Priambudi Huda Firmani, S.Tr, M.Sc</li><li>Agita Devi Prastiwi, M.Si.</li></ul></td><td class="mat-col"><a class="material-link pdf" href="/assets/materi/2.6-analysis-national-observing-network.pdf" download><i class="fas fa-file-pdf"></i>PDF</a></td></tr>
+                <tr><td>14.45 &ndash; 15.15</td><td>2.7 Introduction to GBON and RBON in OSCAR/Surface (30&rsquo;):<ul><li>Overview of GBON Requirements</li><li>Overview of the RBON Framework</li><li>Use of OSCAR/Surface for GBON and RBON Metadata</li></ul></td><td><ul><li>Dr. Regina Yulia Yasmin, MT</li><li>Hesti Hati Nurani, S.Tr.Inst.</li></ul></td><td class="mat-col"><a class="material-link pdf" href="/assets/materi/2.7-introduction-gbon-rbon-oscar.pdf" download><i class="fas fa-file-pdf"></i>PDF</a></td></tr>
+                <tr class="break"><td>15.15 &ndash; 15.30</td><td>Coffee Break (15&rsquo;)</td><td></td><td></td></tr>
+                <tr><td>15.30 &ndash; 16.00</td><td>Open Discussion Session (30&rsquo;)</td><td><ul><li>BMKG 2nd Day Team</li><li>DGMET Oman</li></ul></td><td></td></tr>
+                <tr><td>16.00 &ndash; 16.15</td><td>Wrapping Up Day 2</td><td>Dr. Regina Yulia Yasmin, MT</td><td></td></tr>
+            </table>
+            </details>
+
+            <details class="agenda-day">
+                <summary>Day 3 &mdash; WIGOS Data Quality Monitoring System (WDQMS)</summary>
+            <table class="agenda-table">
+                <tr><th>Time (WIB)</th><th>Topic</th><th>Resource Person</th><th>Materials</th></tr>
+                <tr><td>09.00 &ndash; 09.15</td><td>Review of Day 2 &amp; Introduction to Day 3 (15&rsquo;)</td><td>Dr. Regina Yulia Yasmin, MT</td><td></td></tr>
+                <tr><td>09.15 &ndash; 10.00</td><td>3.1 Introduction to WDQMS &amp; Metadata Linkage (45&rsquo;):<ul><li>WDQMS Concept, Architecture and Monitoring Centres</li><li>Availability and Quality Monitoring</li><li>Integration with OSCAR/Surface</li></ul></td><td><ul><li>Dr. Regina Yulia Yasmin, MT</li><li>Anggi Budi Larasati, S.Tr.</li></ul></td><td class="mat-col"><a class="material-link pdf" href="/assets/materi/3.1-introduction-wdqms.pdf" download><i class="fas fa-file-pdf"></i>PDF</a></td></tr>
+                <tr><td>10.00 &ndash; 10.45</td><td>3.2 WDQMS Practical Session I: Availability Analysis (45&rsquo;):<ul><li>Surface and Upper-Air Availability Analysis</li><li>Comparison across Monitoring Centres</li><li>Identification of Availability Issues</li></ul></td><td><ul><li>Sentia Arianti, S.Tr. Inst</li><li>Dikky Nayosa, S.Kom., M.Kom.</li></ul></td><td class="mat-col"><a class="material-link pdf" href="/assets/materi/3.2-wdqms-practical-availability.pdf" download><i class="fas fa-file-pdf"></i>PDF</a></td></tr>
+                <tr class="break"><td>10.45 &ndash; 11.00</td><td>Coffee Break (15&rsquo;)</td><td></td><td></td></tr>
+                <tr><td>11.00 &ndash; 11.30</td><td>3.3 Cross-checking with OSCAR/Surface (30&rsquo;):<ul><li>Identifying Missing or Faulty Metadata</li><li>Cross-checking Station Configuration and Operational Status</li><li>Metadata Validation and Best Practices</li></ul></td><td><ul><li>Khairani Khalida, S.Tr. Inst</li><li>Keumala Anggraini, S.T., M.Kom.</li></ul></td><td class="mat-col"><a class="material-link pdf" href="/assets/materi/3.3-cross-checking-oscar-surface.pdf" download><i class="fas fa-file-pdf"></i>PDF</a></td></tr>
+                <tr><td>11.30 &ndash; 12.00</td><td>3.4 WDQMS Practical Session II: Quality Analysis (30&rsquo;):<ul><li>Surface and Upper-Air Quality Analysis</li><li>Comparison across Monitoring Centres</li><li>Identification of Quality Issues</li></ul></td><td><ul><li>Join Wan Chanlyn, S.ST, M.Sc</li><li>Afan Maulid Rizqi, S.Si.Kom.</li></ul></td><td class="mat-col"></td></tr>
+                <tr class="break"><td>12.00 &ndash; 13.30</td><td>Lunch Break (90&rsquo;)</td><td></td><td></td></tr>
+                <tr><td>13.30 &ndash; 14.30</td><td>3.5 Interpretation of WDQMS Outputs (60&rsquo;):<ul><li>Interpretation of WDQMS Indicators and Metrics</li><li>Common Operational Issues and Root Causes</li><li>Integrated Analysis of Quality, Availability, and Metadata Issues</li><li>Development of Corrective Actions and Follow-up Recommendations</li></ul></td><td><ul><li>Tika Fitrianti, S.Tr</li><li>Florence Adeleyda Siga, M.Si.</li></ul></td><td class="mat-col"><a class="material-link pdf" href="/assets/materi/3.5-interpretation-wdqms-outputs.pdf" download><i class="fas fa-file-pdf"></i>PDF</a></td></tr>
+                <tr><td>14.30 &ndash; 15.00</td><td>3.6 Introduction to GBON Compliance Monitoring Tools (30&rsquo;):<ul><li>GBON Compliance Concept</li><li>Overview of Compliance Dashboards and Indicators</li><li>Identifying Gaps in GBON Requirements</li><li>Relationship between OSCAR/Surface, WDQMS Outputs and GBON Compliance</li></ul></td><td><ul><li>Dr. Regina Yulia Yasmin, MT</li><li>Hesti Hati Nurani, S.Tr.Inst.</li></ul></td><td class="mat-col"><a class="material-link pdf" href="/assets/materi/3.6-gbon-compliance-monitoring-tools.pdf" download><i class="fas fa-file-pdf"></i>PDF</a></td></tr>
+                <tr class="break"><td>15.00 &ndash; 15.15</td><td>Coffee Break (15&rsquo;)</td><td></td><td></td></tr>
+                <tr><td>15.15 &ndash; 15.45</td><td>3.7 Overview of Indonesian Internal Metadata Application (NIMOS) (30&rsquo;)</td><td><ul><li>Dr. Iqbal, S.Kom, M.T.I</li><li>Zulkarnain Adnan, S.Si, M.Si</li></ul></td><td class="mat-col"></td></tr>
+                <tr><td>15.45 &ndash; 16.00</td><td>Open Discussion Session (15&rsquo;)</td><td><ul><li>BMKG 3rd Day Team</li><li>DGMET Oman</li></ul></td><td></td></tr>
+                <tr><td>16.00 &ndash; 16.15</td><td>Wrapping Up Day 3</td><td>Dr. Regina Yulia Yasmin, MT</td><td></td></tr>
+            </table>
+            </details>
+
+            <details class="agenda-day">
+                <summary>Day 4 &mdash; Incident Management System (IMS) &amp; Complementary Tools</summary>
+            <table class="agenda-table">
+                <tr><th>Time (WIB)</th><th>Topic</th><th>Resource Person</th><th>Materials</th></tr>
+                <tr><td>09.00 &ndash; 09.15</td><td>Review of Day 3 &amp; Introduction to Day 4 (15&rsquo;)</td><td>Dr. Regina Yulia Yasmin, MT</td><td></td></tr>
+                <tr><td>09.15 &ndash; 10.00</td><td>4.1 Introduction to IMS and Operational Workflow (45&rsquo;):<ul><li>Concept and Overview of IMS Architecture, Core Functions</li><li>Relationship between WDQMS Monitoring and IMS Operations</li><li>User Roles and Responsibilities in IMS and RWC Operations</li><li>Account Registration, User Access, and System Navigation</li><li>Ticket Lifecycle and Operational Procedures</li><li>Incident Classification and Coordination Procedures</li></ul></td><td><ul><li>Florence Adeleyda Siga, M.Si.</li><li>Aziz Setia Aji, S.Tr., M.Si.</li></ul></td><td class="mat-col"><a class="material-link pdf" href="/assets/materi/4.1-incident-management-system.pdf" download><i class="fas fa-file-pdf"></i>PDF</a></td></tr>
+                <tr class="break"><td>10.00 &ndash; 10.15</td><td>Coffee Break (15&rsquo;)</td><td></td><td></td></tr>
+                <tr><td>10.15 &ndash; 11.00</td><td>4.2 IMS Practical Session (45&rsquo;):<ul><li>User Login and System Navigation</li><li>Identifying Issues from WDQMS Outputs</li><li>Incident Ticket Management</li><li>Incident Handling and Resolution Procedures</li><li>Operational Coordination and Follow-up Actions</li></ul></td><td><ul><li>Khairani Khalida, S.Tr. Inst</li><li>Mohammad Hajar Zakariya, S.Tr</li></ul></td><td class="mat-col"><a class="material-link pdf" href="/assets/materi/4.2-ims-practical-session.pdf" download><i class="fas fa-file-pdf"></i>PDF</a></td></tr>
+                <tr><td>11.00 &ndash; 11.30</td><td>4.3 Integrated Operational Exercise (30&rsquo;):<ul><li>Integrated Operational Workflow Exercise</li><li>Incident Identification, Tracking, and Resolution</li><li>Coordination of Corrective Actions</li></ul></td><td><ul><li>Sentia Arianti, S.Tr. Inst</li><li>Reza Pitriyanto, S.Tr.Inst</li></ul></td><td class="mat-col"><a class="material-link pdf" href="/assets/materi/4.3-integrated-operational-exercise.pdf" download><i class="fas fa-file-pdf"></i>PDF</a></td></tr>
+                <tr><td>11.30 &ndash; 12.00</td><td>4.4 Operational Case Review and Troubleshooting (30&rsquo;):<ul><li>Review of Operational Incident Scenarios</li><li>Root Cause Analysis and Troubleshooting Approaches</li><li>Best Practices in Incident Resolution and Operational Coordination</li><li>Lessons Learned from Operational Cases</li></ul></td><td><ul><li>Join Wan Chanlyn, S.ST, M.Sc</li><li>Wahyu Abdillah, S.Tr., M.Eng.</li></ul></td><td class="mat-col"><a class="material-link pdf" href="/assets/materi/4.4-operational-case-review.pdf" download><i class="fas fa-file-pdf"></i>PDF</a></td></tr>
+                <tr class="break"><td>12.00 &ndash; 13.30</td><td>Lunch Break (90&rsquo;)</td><td></td><td></td></tr>
+                <tr><td>13.30 &ndash; 13.50</td><td>4.5 RWC Indonesia Complementary Tools (20&rsquo;):<ul><li>Overview of Complementary Monitoring and Analysis Tools</li><li>Integration with WDQMS and IMS Workflow</li><li>Operational Support for GBON Compliance Monitoring</li></ul></td><td><ul><li>Dikky Nayosa, S.Kom., M.Kom.</li><li>Afan Maulid Rizqi, S.Si.Kom.</li></ul></td><td class="mat-col"><a class="material-link pdf" href="/assets/materi/4.5-rwc-indonesia-complementary-tools.pdf" download><i class="fas fa-file-pdf"></i>PDF</a></td></tr>
+                <tr><td>13.50 &ndash; 14.30</td><td>4.6 Overview of WIS 2.0 (40&rsquo;):<ul><li>Architecture and Principles</li><li>Data Discovery and Sharing Concepts</li><li>Relationship between WIS 2.0 and WIGOS</li><li>Overview of WIS 2.0 box</li></ul></td><td><ul><li>Andi Mario Mega Buana Putra, S.Tr, M.Si</li><li>Boma Anjang Pertala, S.Tr.Inst.</li></ul></td><td class="mat-col"><a class="material-link pdf" href="/assets/materi/4.6-wis-2.0-overview.pdf" download><i class="fas fa-file-pdf"></i>PDF</a></td></tr>
+                <tr><td>14.30 &ndash; 15.00</td><td>Training Evaluation and Quiz Session (30&rsquo;)</td><td><ul><li>Anni Arumsari Fitriany, S.Si, M.E</li><li>Rantifa Eka Agustira, S.Tr. Met</li></ul></td><td></td></tr>
+                <tr class="break"><td>15.00 &ndash; 15.15</td><td>Coffee Break (15&rsquo;)</td><td></td><td></td></tr>
+                <tr><td>15.15 &ndash; 15.30</td><td>Open Discussion Session (15&rsquo;)</td><td><ul><li>BMKG 4th Day Team</li><li>DGMET Oman</li></ul></td><td></td></tr>
+                <tr><td>15.30 &ndash; 16.00</td><td>Closing Session (15&rsquo;)</td><td><ul><li>BMKG All Team</li><li>DGMET Oman</li></ul></td><td></td></tr>
+            </table>
+            </details>
+
+            <details class="agenda-day">
+                <summary>Day 5 &mdash; Site Visit</summary>
+            <table class="agenda-table">
+                <tr><th>Time (WIB)</th><th>Topic</th><th>Resource Person</th><th>Materials</th></tr>
+                <tr><td>08.30 &ndash; 10.30</td><td>Visit to the Calibration Laboratory (120&rsquo;)</td><td>Directorate for Instrumentation and Calibration</td><td class="mat-col"></td></tr>
+                <tr class="break"><td>10.30 &ndash; 11.30</td><td>Travel to Soekarno-Hatta Meteorological Station (60&rsquo;)</td><td></td><td></td></tr>
+                <tr class="break"><td>11.30 &ndash; 13.15</td><td>Lunch and Friday Prayer Break (105&rsquo;)</td><td></td><td></td></tr>
+                <tr><td>13.15 &ndash; 13.55</td><td>Session 1 (40&rsquo;):<ul><li>Welcomed by Soekarno-Hatta Aviation Meteorological Station BMKG</li><li>Overview of BMKG&rsquo;s National Aviation Meteorology end to end Services</li><li>Weather Observation Station Operations &mdash; Discussion: Calibration, maintenance, and data quality control procedures</li><li>Guided tour of the Met. Garden</li></ul></td><td><ul><li>Head of Soetta Aviation Meteorological Station BMKG</li><li>Observation Division Staff of Stamet Soetta</li></ul></td><td class="mat-col"></td></tr>
+                <tr><td>13.55 &ndash; 14.10</td><td>Session 2 (15&rsquo;): Forecasting and Reporting Systems</td><td>Forecasting Division Staff of Stamet Soetta</td><td></td></tr>
+                <tr><td>14.10 &ndash; 14.30</td><td>Session 3 (20&rsquo;): Dissemination and User Interface</td><td>Technical / Communications Staff of Stamet Soetta</td><td></td></tr>
+                <tr class="break"><td>14.30 &ndash; 15.00</td><td>Photo Session &amp; Coffee Break (30&rsquo;)</td><td></td><td></td></tr>
+                <tr class="break"><td>15.00 &ndash; 15.30</td><td>Travel to STMKG (30&rsquo;)</td><td></td><td></td></tr>
+                <tr><td>15.30 &ndash; 16.00</td><td>Visit to Weather Radar Facility (90&rsquo;*)</td><td><ul><li>BMKG Visit Team</li><li>DGMET Oman</li><li>Stamet Soetta Team</li></ul></td><td></td></tr>
+            </table>
+            </details>
+
+            <p class="agenda-note">Agenda is tentative and subject to confirmation.</p>
+
+        </div>
+    </section>
+
+
+    <!-- ========== FOOTER ========== -->
+    <footer id="contact">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <img src="/logo-update.svg" alt="RWC Indonesia">
+                    <p>Regional WIGOS Centre Indonesia — A regional centre for implementing the WMO Integrated Global
+                        Observing System (WIGOS) across the RA-V region, operated by BMKG.</p>
+                    <div class="footer-social">
+                        <a href="https://twitter.com/infoBMKG" target="_blank" aria-label="Twitter"><i
+                                class="fab fa-x-twitter"></i></a>
+                        <a href="https://www.instagram.com/infobmkg" target="_blank" aria-label="Instagram"><i
+                                class="fab fa-instagram"></i></a>
+                        <a href="https://www.youtube.com/user/infoBMKG" target="_blank" aria-label="YouTube"><i
+                                class="fab fa-youtube"></i></a>
+                        <a href="https://www.facebook.com/infoBMKG" target="_blank" aria-label="Facebook"><i
+                                class="fab fa-facebook-f"></i></a>
+                    </div>
+                    <div class="footer-partners">
+                        <img src="/assets/logowmo.png" alt="WMO">
+                        <img src="/assets/logo-bmkg.webp" alt="BMKG">
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Navigation</h4>
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/#about">About Us</a></li>
+                        <li><a href="/#dashboards">Dashboards</a></li>
+                        <li><a href="/#services">Services</a></li>
+                        <li><a href="/activities">Activities</a></li>
+                        <li><a href="/reports">Reports</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>WIGOS Services</h4>
+                    <ul>
+                        <li><a href="https://oscar.wmo.int/surface/" target="_blank">OSCAR/Surface</a></li>
+                        <li><a href="https://wdqms.wmo.int/" target="_blank">WDQMS Monitoring</a></li>
+                        <li><a href="https://community.wmo.int/activity-areas/wigos" target="_blank">WIGOS Technical
+                                Info</a></li>
+                        <li><a href="https://jira.wmo.int/" target="_blank">WMO Global Jira</a></li>
+                        <li><a href="/monitoring/report.html">Regional Summary</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Contact</h4>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt" style="color:var(--accent);margin-right:6px;"></i> Jl.
+                            Angkasa I No.2, Kemayoran, Jakarta, Indonesia</li>
+                        <li><i class="fas fa-phone" style="color:var(--accent);margin-right:6px;"></i> +62 21 6546315
+                        </li>
+                        <li><i class="fas fa-envelope" style="color:var(--accent);margin-right:6px;"></i>
+                            inarwc@bmkg.go.id
+                        </li>
+                        <li><i class="fas fa-globe" style="color:var(--accent);margin-right:6px;"></i> wmo.int/wigos
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                &copy; 2026 RWC Indonesia — BMKG | WMO Integrated Global Observing System. All Rights Reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script src="/script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Overview - RWC-Indonesia Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; background: #f8f9fa; min-height: 100vh; }
+        .navbar-doc { background: linear-gradient(135deg, #1a1a2e, #16213e); padding: 1rem 2rem; }
+        .navbar-doc a { color: white; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; }
+        .navbar-doc h4 { color: white; margin: 0; }
+        .content { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+        .page-title { font-size: 2rem; font-weight: 700; color: #1a1a2e; margin-bottom: 0.5rem; }
+        .page-subtitle { color: #6c757d; margin-bottom: 2rem; }
+        
+        .overview-diagram {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            margin-bottom: 2rem;
+        }
+        
+        .system-box {
+            border: 2px solid #e9ecef;
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+        .system-box:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.2);
+        }
+        .system-box .icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 1.5rem;
+            color: white;
+        }
+        .system-box h5 { font-weight: 600; color: #1a1a2e; margin-bottom: 0.5rem; }
+        .system-box p { font-size: 0.85rem; color: #6c757d; margin: 0; }
+        
+        .arrow-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem 0;
+        }
+        .arrow { font-size: 2rem; color: #667eea; }
+        
+        .info-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            height: 100%;
+        }
+        .info-card h5 {
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .info-card ul { padding-left: 1.2rem; margin: 0; }
+        .info-card li { color: #495057; margin-bottom: 0.5rem; font-size: 0.9rem; }
+        
+        .tech-badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            background: #e9ecef;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin: 0.2rem;
+            color: #495057;
+        }
+        
+        .bg-primary-gradient { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .bg-success-gradient { background: linear-gradient(135deg, #11998e, #38ef7d); }
+        .bg-warning-gradient { background: linear-gradient(135deg, #f093fb, #f5576c); }
+        .bg-info-gradient { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+        .bg-danger-gradient { background: linear-gradient(135deg, #ff416c, #ff4b2b); }
+    </style>
+</head>
+<body>
+    <nav class="navbar-doc">
+        <div class="d-flex justify-content-between align-items-center">
+            <a href="index.html"><i class="bi bi-arrow-left"></i> Back to Documentation</a>
+            <h4>System Overview</h4>
+        </div>
+    </nav>
+
+    <div class="content">
+        <h1 class="page-title">System Overview</h1>
+        <p class="page-subtitle">Complete overview of the RWC-Indonesia Jira WMO Issues Dashboard</p>
+
+        <!-- Main System Diagram -->
+        <div class="overview-diagram">
+            <h5 class="mb-4 text-center"><i class="bi bi-diagram-3"></i> System Components</h5>
+            
+            <div class="row g-4">
+                <!-- Data Source -->
+                <div class="col-md-4">
+                    <div class="system-box">
+                        <div class="icon bg-danger-gradient">
+                            <i class="bi bi-cloud-download"></i>
+                        </div>
+                        <h5>Data Source</h5>
+                        <p>Jira WMO API</p>
+                        <div class="mt-2">
+                            <span class="tech-badge">REST API</span>
+                            <span class="tech-badge">JSON</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Backend Server -->
+                <div class="col-md-4">
+                    <div class="system-box">
+                        <div class="icon bg-primary-gradient">
+                            <i class="bi bi-server"></i>
+                        </div>
+                        <h5>Backend Server</h5>
+                        <p>Node.js + Express</p>
+                        <div class="mt-2">
+                            <span class="tech-badge">Node.js</span>
+                            <span class="tech-badge">Express</span>
+                            <span class="tech-badge">Puppeteer</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Database -->
+                <div class="col-md-4">
+                    <div class="system-box">
+                        <div class="icon bg-success-gradient">
+                            <i class="bi bi-database"></i>
+                        </div>
+                        <h5>Database</h5>
+                        <p>MySQL Database</p>
+                        <div class="mt-2">
+                            <span class="tech-badge">MySQL</span>
+                            <span class="tech-badge">SQLite</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="arrow-container">
+                <i class="bi bi-arrow-down arrow"></i>
+            </div>
+
+            <div class="row g-4">
+                <!-- Frontend -->
+                <div class="col-md-6">
+                    <div class="system-box">
+                        <div class="icon bg-info-gradient">
+                            <i class="bi bi-window"></i>
+                        </div>
+                        <h5>Frontend (Public)</h5>
+                        <p>Dashboard & Statistics</p>
+                        <div class="mt-2">
+                            <span class="tech-badge">HTML5</span>
+                            <span class="tech-badge">Bootstrap 5</span>
+                            <span class="tech-badge">Chart.js</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Panel -->
+                <div class="col-md-6">
+                    <div class="system-box">
+                        <div class="icon bg-warning-gradient">
+                            <i class="bi bi-shield-lock"></i>
+                        </div>
+                        <h5>Admin Panel</h5>
+                        <p>Report Generation & Management</p>
+                        <div class="mt-2">
+                            <span class="tech-badge">Authentication</span>
+                            <span class="tech-badge">DOCX Generation</span>
+                            <span class="tech-badge">Chart Export</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Cards -->
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="info-card">
+                    <h5><i class="bi bi-layers text-primary"></i> Pages</h5>
+                    <ul>
+                        <li><strong>index.html</strong> - Issue List & Status Chart</li>
+                        <li><strong>stats.html</strong> - Statistics & Analytics</li>
+                        <li><strong>report.html</strong> - Issue Reports</li>
+                        <li><strong>admin.html</strong> - Admin Dashboard</li>
+                        <li><strong>about.html</strong> - About Page</li>
+                        <li><strong>contact.html</strong> - Contact Page</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="info-card">
+                    <h5><i class="bi bi-gear text-success"></i> Main Features</h5>
+                    <ul>
+                        <li>Issue filtering by multiple criteria</li>
+                        <li>Interactive charts (Bar, Pie, Stacked)</li>
+                        <li>Monthly report generation (DOCX)</li>
+                        <li>Chart export to PNG/ZIP</li>
+                        <li>Country management</li>
+                        <li>System logs viewer</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="info-card">
+                    <h5><i class="bi bi-graph-up text-danger"></i> Chart Types</h5>
+                    <ul>
+                        <li>Issue Count by Status (3 modes)</li>
+                        <li>Issues by Country</li>
+                        <li>Issues by Country & Status (Stacked)</li>
+                        <li>Issues by WIGOS Category</li>
+                        <li>All Data Status Charts (3 modes)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

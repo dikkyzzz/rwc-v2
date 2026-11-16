@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="RWC Indonesia Capacity Development — workshops and technical training for RA-V member countries.">
+    <title>Capacity Development — RWC Indonesia</title>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="icon" href="/logo-update.svg" type="image/svg+xml">
+    <style>
+        .page-hero { padding: 9rem 0 2rem; text-align: center; }
+        .content-section { padding: 2rem 0 6rem; }
+        /* Filter tabs */
+        .filter-tabs { display: flex; gap: .5rem; justify-content: center; margin-bottom: 2rem; flex-wrap: wrap; }
+        .filter-tabs button {
+            padding: .5rem 1.25rem; border-radius: 8px; font-size: .88rem; font-weight: 600;
+            border: 1px solid rgba(19,49,95,.15); background: #fff; color: var(--gray-700);
+            cursor: pointer; transition: all .2s ease;
+        }
+        .filter-tabs button:hover { border-color: var(--primary-light); color: var(--primary); }
+        .filter-tabs button.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+        /* Activity list (minimalis, konsisten dgn reports) */
+        .activity-list { max-width: 760px; margin: 0 auto; }
+        .activity-year { margin-bottom: 1rem; }
+        .activity-year > summary {
+            list-style: none; cursor: pointer;
+            font-size: 1.3rem; font-weight: 700; color: var(--primary);
+            padding-bottom: .4rem; display: flex; align-items: baseline; gap: .5rem;
+        }
+        .activity-year > summary::-webkit-details-marker { display: none; }
+        .activity-year > summary::after {
+            content: "\f054"; font-family: "Font Awesome 6 Free"; font-weight: 900;
+            font-size: .8rem; color: var(--accent); transition: transform .2s ease; margin-left: .15rem;
+        }
+        .activity-year[open] > summary::after { content: "\f077"; }
+        .activity-items { list-style: none; padding: .5rem 0 0 1rem; margin: 0; }
+        .activity-items li {
+            display: flex; align-items: baseline; gap: .6rem;
+            padding: .4rem 0; font-size: .95rem; line-height: 1.7;
+        }
+        .activity-items li .ai-label { flex: 1; color: var(--gray-700); }
+        .activity-items li .ai-label small { display: block; color: var(--gray-500); font-size: .76rem; margin-top: .1rem; }
+        .activity-items li .ai-type { display: inline-block; font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--accent); background: rgba(47,111,228,.08); padding: .15rem .5rem; border-radius: 4px; margin-right: .5rem; }
+        .activity-items li .ai-type.workshop { color: #b45309; background: rgba(234,179,8,.10); }
+        .activity-items li .ai-type.training { color: #15803d; background: rgba(34,197,94,.10); }
+        .activity-items li a { color: var(--accent); font-size: .82rem; font-weight: 600; text-decoration: none; white-space: nowrap; }
+        .activity-items li a:hover { text-decoration: underline; }
+        .activity-items li.hidden { display: none; }
+        .loading-note { text-align: center; color: var(--gray-500); padding: 2rem 0; }
+        .empty-note { text-align: center; color: var(--gray-500); padding: 1.5rem 0; font-style: italic; }
+    </style>
+</head>
+
+<body>
+
+    <!-- ========== HEADER ========== -->
+    <header id="header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="/" class="nav-brand">
+                    <img src="/logo-update.svg" alt="RWC Indonesia Logo">
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a href="/">Home</a>
+                    <a href="/#dashboards">Dashboards</a>
+                    <a href="/#about">About</a>
+                    <a href="/#services">Services</a>
+                    <a href="/activities" class="active">Activities</a>
+                    <a href="/reports">Reports</a>
+                    <a href="/#contact" class="nav-cta">Contact</a>
+                </div>
+                <button class="hamburger" id="hamburger" aria-label="Menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ========== PAGE HERO ========== -->
+    <section class="page-hero">
+        <div class="container">
+            <a class="back-link" href="/activities" style="display:inline-flex;align-items:center;gap:.4rem;margin-bottom:1.5rem;font-weight:700;text-decoration:none;color:var(--primary-dark);">
+                <i class="fas fa-arrow-left"></i> Activities
+            </a>
+            <div class="section-title animate-on-scroll">
+                <h2>Capacity Development</h2>
+                <p>Workshops and technical training conducted by RWC Indonesia for WMO Region V member countries on WIGOS
+                    standards, observation metadata, and data exchange.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== ACTIVITY LIST ========== -->
+    <!--
+        CARA TAMBAH AKTIVITAS BARU:
+        1. Cari tahun yang sesuai (atau buat <details class="activity-year"> baru, taruh di atas untuk tahun terbaru).
+        2. Tambah <li> di dalam <ul class="activity-items"> dgn atribut data-type="workshop" atau "training".
+        3. Untuk halaman detail: copy landingpage/training-im-metadata-wigos-tools.html
+           menjadi landingpage/training-<slug>.html, lalu daftarkan slug di server/server.js (capacityTrainingPages).
+    -->
+    <section class="content-section">
+        <div class="container">
+            <div class="filter-tabs">
+                <button class="active" data-filter="all">All</button>
+                <button data-filter="workshop">Workshop</button>
+                <button data-filter="training">Training</button>
+            </div>
+
+            <div class="activity-list" id="activityList">
+
+                <!-- ===== 2026 (terbaru) ===== -->
+                <details class="activity-year" open>
+                    <summary>2026</summary>
+                    <ul class="activity-items">
+                        <li data-type="training">
+                            <span class="ai-label">
+                                <span class="ai-type training">Training</span>
+                                Training on Meteorological Instrument Metadata and WIGOS Tools
+                                <small>12 – 16 October 2026 · In-person for DGMET Oman · Jakarta</small>
+                            </span>
+                            <a href="/activities/capacity-development/im-metadata-wigos-tools">Details</a>
+                        </li>
+                    </ul>
+                </details>
+
+                <!-- ===== 2025 ===== -->
+                <details class="activity-year">
+                    <summary>2025</summary>
+                    <ul class="activity-items">
+                        <li data-type="workshop">
+                            <span class="ai-label">
+                                <span class="ai-type workshop">Workshop</span>
+                                No workshops recorded
+                                <small>Workshop activities for 2025 will be listed here.</small>
+                            </span>
+                        </li>
+                    </ul>
+                </details>
+
+                <!-- ===== 2024 ===== -->
+                <details class="activity-year">
+                    <summary>2024</summary>
+                    <ul class="activity-items">
+                        <li data-type="workshop">
+                            <span class="ai-label">
+                                <span class="ai-type workshop">Workshop</span>
+                                No workshops recorded
+                                <small>Workshop activities for 2024 will be listed here.</small>
+                            </span>
+                        </li>
+                    </ul>
+                </details>
+
+            </div>
+            <p class="empty-note" id="emptyNote" style="display:none;">No activities match the selected filter.</p>
+        </div>
+    </section>
+
+    <!-- ========== FOOTER ========== -->
+    <footer id="contact">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <img src="/logo-update.svg" alt="RWC Indonesia">
+                    <p>Regional WIGOS Centre Indonesia — A regional centre for implementing the WMO Integrated Global
+                        Observing System (WIGOS) across the RA-V region, operated by BMKG.</p>
+                    <div class="footer-social">
+                        <a href="https://twitter.com/infoBMKG" target="_blank" aria-label="Twitter"><i
+                                class="fab fa-x-twitter"></i></a>
+                        <a href="https://www.instagram.com/infobmkg" target="_blank" aria-label="Instagram"><i
+                                class="fab fa-instagram"></i></a>
+                        <a href="https://www.youtube.com/user/infoBMKG" target="_blank" aria-label="YouTube"><i
+                                class="fab fa-youtube"></i></a>
+                        <a href="https://www.facebook.com/infoBMKG" target="_blank" aria-label="Facebook"><i
+                                class="fab fa-facebook-f"></i></a>
+                    </div>
+                    <div class="footer-partners">
+                        <img src="/assets/logowmo.png" alt="WMO">
+                        <img src="/assets/logo-bmkg.webp" alt="BMKG">
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Navigation</h4>
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/#about">About Us</a></li>
+                        <li><a href="/#dashboards">Dashboards</a></li>
+                        <li><a href="/#services">Services</a></li>
+                        <li><a href="/activities">Activities</a></li>
+                        <li><a href="/reports">Reports</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>WIGOS Services</h4>
+                    <ul>
+                        <li><a href="https://oscar.wmo.int/surface/" target="_blank">OSCAR/Surface</a></li>
+                        <li><a href="https://wdqms.wmo.int/" target="_blank">WDQMS Monitoring</a></li>
+                        <li><a href="https://community.wmo.int/activity-areas/wigos" target="_blank">WIGOS Technical
+                                Info</a></li>
+                        <li><a href="https://jira.wmo.int/" target="_blank">WMO Global Jira</a></li>
+                        <li><a href="/monitoring/report.html">Regional Summary</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Contact</h4>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt" style="color:var(--accent);margin-right:6px;"></i> Jl.
+                            Angkasa I No.2, Kemayoran, Jakarta, Indonesia</li>
+                        <li><i class="fas fa-phone" style="color:var(--accent);margin-right:6px;"></i> +62 21 6546315
+                        </li>
+                        <li><i class="fas fa-envelope" style="color:var(--accent);margin-right:6px;"></i>
+                            inarwc@bmkg.go.id
+                        </li>
+                        <li><i class="fas fa-globe" style="color:var(--accent);margin-right:6px;"></i> wmo.int/wigos
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                &copy; 2026 RWC Indonesia — BMKG | WMO Integrated Global Observing System. All Rights Reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script src="/script.js"></script>
+    <script>
+        (function () {
+            const params = new URLSearchParams(location.search);
+            const initialFilter = params.get('type') || 'all';
+
+            const tabs = document.querySelectorAll('.filter-tabs button');
+            const items = document.querySelectorAll('.activity-items li[data-type]');
+            const emptyNote = document.getElementById('emptyNote');
+            const years = document.querySelectorAll('.activity-year');
+
+            function applyFilter(filter) {
+                tabs.forEach(t => t.classList.toggle('active', t.dataset.filter === filter));
+                let visibleCount = 0;
+                items.forEach(li => {
+                    const match = (filter === 'all' || li.dataset.type === filter);
+                    li.classList.toggle('hidden', !match);
+                    if (match) visibleCount++;
+                });
+                emptyNote.style.display = visibleCount === 0 ? 'block' : 'none';
+                // Auto-expand tahun yang punya item tampil, collapse yang kosong
+                years.forEach(y => {
+                    const hasVisible = Array.from(y.querySelectorAll('li[data-type]')).some(li => !li.classList.contains('hidden'));
+                    y.open = hasVisible && (filter !== 'all' || y === years[0]);
+                });
+            }
+
+            tabs.forEach(t => t.addEventListener('click', () => applyFilter(t.dataset.filter)));
+            applyFilter(initialFilter);
+        })();
+    </script>
+</body>
+
+</html>

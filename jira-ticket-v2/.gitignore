@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+server/node_modules/
+
+# Environment / secrets
+.env
+*.env
+config.env
+server/.env
+
+# Cache & logs
+wdqms/cache/
+wdqms/logs/
+*.log
+logs/
+
+# Generated files
+charts/
+contoh_hasil_generated.docx
+Laporan_Bulanan_*.docx
+
+# Database
+*.db
+*.sqlite
+
+# OS
+.DS_Store
+Thumbs.db
+
+# PM2
+.pm2/
+
+# Large training materials exceeding GitHub's 100 MB per-file limit.
+# Upload manually to the production server (scp/rsync) instead.
+landingpage/assets/materi/5-profil-stasiun-meteorologi-soetta.pptx

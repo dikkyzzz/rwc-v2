@@ -1,0 +1,4 @@
+[submodule "wdqms-v2"]
+	path = wdqms-v2
+	url = https://github.com/dikkyzzz/wdqms-v2.git
+	branch = main

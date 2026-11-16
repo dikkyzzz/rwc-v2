@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Flow - RWC-Indonesia Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; background: #f8f9fa; min-height: 100vh; }
+        .navbar-doc { background: linear-gradient(135deg, #1a1a2e, #16213e); padding: 1rem 2rem; }
+        .navbar-doc a { color: white; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; }
+        .navbar-doc h4 { color: white; margin: 0; }
+        .content { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        .page-title { font-size: 2rem; font-weight: 700; color: #1a1a2e; margin-bottom: 0.5rem; }
+        .page-subtitle { color: #6c757d; margin-bottom: 2rem; }
+        
+        .flow-section {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            margin-bottom: 2rem;
+        }
+        .flow-section h5 {
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .flow-container {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+        
+        .flow-step {
+            text-align: center;
+            min-width: 120px;
+        }
+        .flow-step .step-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.75rem;
+            font-size: 1.5rem;
+            color: white;
+            position: relative;
+        }
+        .flow-step .step-number {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 24px;
+            height: 24px;
+            background: #1a1a2e;
+            border-radius: 50%;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        .flow-step h6 { font-size: 0.85rem; font-weight: 600; color: #1a1a2e; margin-bottom: 0.25rem; }
+        .flow-step p { font-size: 0.75rem; color: #6c757d; margin: 0; }
+        
+        .flow-arrow {
+            font-size: 1.5rem;
+            color: #dee2e6;
+        }
+        
+        .bg-blue { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .bg-green { background: linear-gradient(135deg, #11998e, #38ef7d); }
+        .bg-orange { background: linear-gradient(135deg, #f093fb, #f5576c); }
+        .bg-cyan { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+        .bg-red { background: linear-gradient(135deg, #ff416c, #ff4b2b); }
+        .bg-purple { background: linear-gradient(135deg, #a18cd1, #fbc2eb); }
+        
+        .user-type-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            height: 100%;
+        }
+        .user-type-card .user-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+            margin-bottom: 1rem;
+        }
+        .user-type-card h5 { font-weight: 600; margin-bottom: 1rem; }
+        .user-type-card ul { padding-left: 1.2rem; margin: 0; }
+        .user-type-card li { font-size: 0.9rem; color: #495057; margin-bottom: 0.5rem; }
+        
+        .navigation-map {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+        .nav-item-box {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        .nav-item-box:hover {
+            border-color: #667eea;
+            transform: translateY(-3px);
+        }
+        .nav-item-box i { font-size: 1.5rem; color: #667eea; display: block; margin-bottom: 0.5rem; }
+        .nav-item-box h6 { margin: 0; font-size: 0.9rem; font-weight: 600; }
+        .nav-item-box small { color: #6c757d; font-size: 0.75rem; }
+    </style>
+</head>
+<body>
+    <nav class="navbar-doc">
+        <div class="d-flex justify-content-between align-items-center">
+            <a href="index.html"><i class="bi bi-arrow-left"></i> Back to Documentation</a>
+            <h4>User Flow</h4>
+        </div>
+    </nav>
+
+    <div class="content">
+        <h1 class="page-title">User Flow</h1>
+        <p class="page-subtitle">User journey and navigation through the dashboard</p>
+
+        <!-- User Types -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-6">
+                <div class="user-type-card">
+                    <div class="user-icon bg-blue">
+                        <i class="bi bi-person"></i>
+                    </div>
+                    <h5>Public User</h5>
+                    <ul>
+                        <li>View issue list and filter by criteria</li>
+                        <li>View statistics and charts</li>
+                        <li>Access report page</li>
+                        <li>View about and contact information</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="user-type-card">
+                    <div class="user-icon bg-orange">
+                        <i class="bi bi-person-gear"></i>
+                    </div>
+                    <h5>Admin User</h5>
+                    <ul>
+                        <li>All public user capabilities</li>
+                        <li>Generate monthly reports (DOCX)</li>
+                        <li>Download charts (PNG/ZIP)</li>
+                        <li>Manage country list</li>
+                        <li>View system logs</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Public User Flow -->
+        <div class="flow-section">
+            <h5><i class="bi bi-person text-primary"></i> Public User Flow</h5>
+            <div class="flow-container">
+                <div class="flow-step">
+                    <div class="step-icon bg-blue">
+                        <i class="bi bi-box-arrow-in-right"></i>
+                        <span class="step-number">1</span>
+                    </div>
+                    <h6>Enter Site</h6>
+                    <p>index.html</p>
+                </div>
+                <span class="flow-arrow"><i class="bi bi-arrow-right"></i></span>
+                <div class="flow-step">
+                    <div class="step-icon bg-cyan">
+                        <i class="bi bi-list-ul"></i>
+                        <span class="step-number">2</span>
+                    </div>
+                    <h6>View Tickets</h6>
+                    <p>Filter & Search</p>
+                </div>
+                <span class="flow-arrow"><i class="bi bi-arrow-right"></i></span>
+                <div class="flow-step">
+                    <div class="step-icon bg-green">
+                        <i class="bi bi-funnel"></i>
+                        <span class="step-number">3</span>
+                    </div>
+                    <h6>Apply Filters</h6>
+                    <p>Status, Country, Date</p>
+                </div>
+                <span class="flow-arrow"><i class="bi bi-arrow-right"></i></span>
+                <div class="flow-step">
+                    <div class="step-icon bg-purple">
+                        <i class="bi bi-bar-chart"></i>
+                        <span class="step-number">4</span>
+                    </div>
+                    <h6>View Chart</h6>
+                    <p>Interactive Chart</p>
+                </div>
+                <span class="flow-arrow"><i class="bi bi-arrow-right"></i></span>
+                <div class="flow-step">
+                    <div class="step-icon bg-orange">
+                        <i class="bi bi-graph-up"></i>
+                        <span class="step-number">5</span>
+                    </div>
+                    <h6>Statistics</h6>
+                    <p>stats.html</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin User Flow -->
+        <div class="flow-section">
+            <h5><i class="bi bi-person-gear text-danger"></i> Admin User Flow</h5>
+            <div class="flow-container">
+                <div class="flow-step">
+                    <div class="step-icon bg-red">
+                        <i class="bi bi-shield-lock"></i>
+                        <span class="step-number">1</span>
+                    </div>
+                    <h6>Login</h6>
+                    <p>admin-login.html</p>
+                </div>
+                <span class="flow-arrow"><i class="bi bi-arrow-right"></i></span>
+                <div class="flow-step">
+                    <div class="step-icon bg-orange">
+                        <i class="bi bi-speedometer2"></i>
+                        <span class="step-number">2</span>
+                    </div>
+                    <h6>Dashboard</h6>
+                    <p>admin.html</p>
+                </div>
+                <span class="flow-arrow"><i class="bi bi-arrow-right"></i></span>
+                <div class="flow-step">
+                    <div class="step-icon bg-green">
+                        <i class="bi bi-file-earmark-text"></i>
+                        <span class="step-number">3</span>
+                    </div>
+                    <h6>Generate Report</h6>
+                    <p>Select Month</p>
+                </div>
+                <span class="flow-arrow"><i class="bi bi-arrow-right"></i></span>
+                <div class="flow-step">
+                    <div class="step-icon bg-cyan">
+                        <i class="bi bi-download"></i>
+                        <span class="step-number">4</span>
+                    </div>
+                    <h6>Download</h6>
+                    <p>DOCX & Charts</p>
+                </div>
+                <span class="flow-arrow"><i class="bi bi-arrow-right"></i></span>
+                <div class="flow-step">
+                    <div class="step-icon bg-purple">
+                        <i class="bi bi-globe"></i>
+                        <span class="step-number">5</span>
+                    </div>
+                    <h6>Manage</h6>
+                    <p>Countries & Logs</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Site Navigation Map -->
+        <div class="flow-section">
+            <h5><i class="bi bi-diagram-3 text-success"></i> Site Navigation Map</h5>
+            <div class="navigation-map">
+                <div class="nav-item-box">
+                    <i class="bi bi-house-door"></i>
+                    <h6>Home</h6>
+                    <small>index.html</small>
+                </div>
+                <div class="nav-item-box">
+                    <i class="bi bi-graph-up-arrow"></i>
+                    <h6>Statistics</h6>
+                    <small>stats.html</small>
+                </div>
+                <div class="nav-item-box">
+                    <i class="bi bi-file-text"></i>
+                    <h6>Summary</h6>
+                    <small>report.html</small>
+                </div>
+                <div class="nav-item-box">
+                    <i class="bi bi-gear"></i>
+                    <h6>Admin</h6>
+                    <small>admin.html</small>
+                </div>
+                <div class="nav-item-box">
+                    <i class="bi bi-info-circle"></i>
+                    <h6>About</h6>
+                    <small>about.html</small>
+                </div>
+                <div class="nav-item-box">
+                    <i class="bi bi-envelope"></i>
+                    <h6>Contact</h6>
+                    <small>contact.html</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Flow -->
+        <div class="flow-section">
+            <h5><i class="bi bi-lightning text-warning"></i> Report Generation Flow</h5>
+            <div class="flow-container">
+                <div class="flow-step">
+                    <div class="step-icon bg-blue">
+                        <i class="bi bi-calendar"></i>
+                        <span class="step-number">1</span>
+                    </div>
+                    <h6>Select Month</h6>
+                    <p>Choose period</p>
+                </div>
+                <span class="flow-arrow"><i class="bi bi-arrow-right"></i></span>
+                <div class="flow-step">
+                    <div class="step-icon bg-cyan">
+                        <i class="bi bi-cpu"></i>
+                        <span class="step-number">2</span>
+                    </div>
+                    <h6>Process</h6>
+                    <p>Server generates</p>
+                </div>
+                <span class="flow-arrow"><i class="bi bi-arrow-right"></i></span>
+                <div class="flow-step">
+                    <div class="step-icon bg-green">
+                        <i class="bi bi-image"></i>
+                        <span class="step-number">3</span>
+                    </div>
+                    <h6>Create Charts</h6>
+                    <p>9 PNG files</p>
+                </div>
+                <span class="flow-arrow"><i class="bi bi-arrow-right"></i></span>
+                <div class="flow-step">
+                    <div class="step-icon bg-purple">
+                        <i class="bi bi-file-word"></i>
+                        <span class="step-number">4</span>
+                    </div>
+                    <h6>Generate DOCX</h6>
+                    <p>Monthly report</p>
+                </div>
+                <span class="flow-arrow"><i class="bi bi-arrow-right"></i></span>
+                <div class="flow-step">
+                    <div class="step-icon bg-orange">
+                        <i class="bi bi-cloud-download"></i>
+                        <span class="step-number">5</span>
+                    </div>
+                    <h6>Download</h6>
+                    <p>DOCX + ZIP</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

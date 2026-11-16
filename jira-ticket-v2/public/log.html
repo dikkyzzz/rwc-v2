@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Scrape Logs - Jira WMO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #ffffff;
+            color: #000;
+            padding-top: 4.5rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            margin: 0;
+        }
+
+        .navbar {
+            background-color: white;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            color: #333 !important;
+            font-weight: bold;
+        }
+
+        .nav-link {
+            color: #333 !important;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            color: #333 !important;
+        }
+
+        .footer {
+            flex-shrink: 0;
+            background-color: #040433;
+            color: white;
+            font-size: 0.9rem;
+            padding: 1rem 0;
+            width: 100%;
+        }
+
+        .footer a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        .log-toolbar {
+            position: sticky;
+            top: 4.5rem;
+            z-index: 100;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .log-container {
+            background: #0b0e12;
+            color: #e8e8e8;
+            border-radius: .5rem;
+            border: 1px solid #1f2937;
+            padding: 1rem;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-size: 12px;
+            line-height: 1.4;
+            overflow: auto;
+            max-height: 70vh;
+            white-space: pre;
+        }
+
+        .badge-live {
+            background: #22c55e;
+        }
+
+        .badge-paused {
+            background: #ef4444;
+        }
+
+        .log-line {
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .muted {
+            color: #9ca3af;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="index.html">
+                <img src="/logowmo.png" alt="Logo" width="150" height="75" class="me-2" />
+            </a>
+            <a class="navbar-brand fw-bold" href="index.html">
+                <img src="/logo-bmkg.webp" alt="Logo" width="50" height="60" class="me-2" />
+            </a>
+            <a class="navbar-brand fw-bold" href="index.html">
+                <img src="/logo-update.svg" alt="Logo" width="90" height="40" class="me-2" />
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Ticket List</a></li>
+                    <li class="nav-item"><a class="nav-link" href="stats.html">Statistics</a></li>
+                    <li class="nav-item"><a class="nav-link" href="report.html">Summary</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <br><br>
+    <div class="log-toolbar py-2">
+        <div class="container-fluid">
+            <div class="row g-2 align-items-center">
+                <div class="col-md-3 col-6">
+                    <label class="form-label mb-0 small">Max Lines</label>
+                    <select id="maxLines" class="form-select form-select-sm">
+                        <option value="200">200</option>
+                        <option value="500">500</option>
+                        <option value="1000" selected>1000</option>
+                        <option value="2000">2000</option>
+                    </select>
+                </div>
+                <div class="col-md-3 col-6">
+                    <label class="form-label mb-0 small">Auto Refresh</label>
+                    <div class="input-group input-group-sm">
+                        <select id="refreshInterval" class="form-select form-select-sm">
+                            <option value="0">Off</option>
+                            <option value="5">5s</option>
+                            <option value="10" selected>10s</option>
+                            <option value="30">30s</option>
+                            <option value="60">60s</option>
+                        </select>
+                        <span id="liveBadge" class="badge badge-live ms-2 align-self-center">LIVE</span>
+                    </div>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <button id="btnRefresh" class="btn btn-primary btn-sm">Refresh</button>
+                    <button id="btnOpenLocal" class="btn btn-outline-primary btn-sm">Open Local Log…</button>
+                    <button id="btnTop" class="btn btn-outline-secondary btn-sm">Top</button>
+                    <button id="btnBottom" class="btn btn-outline-secondary btn-sm">Bottom</button>
+                    <span id="meta" class="ms-2 small text-muted"></span>
+                    <input id="fileInput" type="file" accept=".log,text/plain" style="display:none" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main class="container-fluid my-3 flex-grow-1">
+        <div id="log" class="log-container"></div>
+    </main>
+
+    <footer class="footer text-white py-3 mt-4">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-md-4 text-center text-md-start mb-2 mb-md-0">
+                    <div class="d-flex align-items-start">
+                        <img src="/logo-bmkg.png" alt="Logo BMKG" width="100" height="100"
+                            class="me-3 align-self-start">
+                        <div>
+                            <div class="d-flex flex-row flex-wrap align-items-center mb-2">
+                                <a href="https://wdqms.wmo.int/" target="_blank" rel="noopener noreferrer"
+                                    class="text-white text-decoration-none small me-3">WDQMS</a>
+                                <a href="https://jira.wmo.int/" target="_blank" rel="noopener noreferrer"
+                                    class="text-white text-decoration-none small me-3">Jira WMO</a>
+                                <a href="https://bmkg.go.id/" target="_blank" rel="noopener noreferrer"
+                                    class="text-white text-decoration-none small">BMKG</a>
+                            </div>
+                            <small>
+                                Jl. Angkasa I No.2 Kemayoran, Jakarta Pusat 10610, PO Box 3540 Jkt.<br>
+                                Contact Center (021) 196 | Faks (021) 4246703<br>
+                                <a href="mailto:dikky.nayosa@bmkg.go.id"
+                                    class="text-white text-decoration-none">dikky.nayosa@bmkg.go.id</a>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 text-center">
+                    <small>&copy; <span id="currentYear">2024</span> - Badan Meteorologi, Klimatologi, dan
+                        Geofisika</small>
+                </div>
+                <div class="col-md-4 text-center text-md-end"></div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const logEl = document.getElementById('log');
+        const metaEl = document.getElementById('meta');
+        const maxLinesEl = document.getElementById('maxLines');
+        const refreshSelect = document.getElementById('refreshInterval');
+        const liveBadge = document.getElementById('liveBadge');
+        const btnOpenLocal = document.getElementById('btnOpenLocal');
+        const fileInput = document.getElementById('fileInput');
+        let timer = null;
+        let fileHandle = null; // File System Access API handle
+
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        async function fetchLog() {
+            const lines = parseInt(maxLinesEl.value, 10) || 1000;
+            try {
+                // Coba API utama (port 4000)
+                const res = await fetch(`/api/logs/scrape?lines=${lines}`);
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const data = await res.json();
+                renderLog(data);
+                return;
+            } catch (_) { }
+            try {
+                // Coba logs helper server (port 4001)
+                const res2 = await fetch(`http://localhost:4001/api/logs/scrape?lines=${lines}`);
+                if (!res2.ok) throw new Error(`HTTP ${res2.status}`);
+                const data2 = await res2.json();
+                renderLog(data2);
+                return;
+            } catch (e) {
+                // Fallback: baca dari file lokal jika tersedia
+                if (fileHandle) {
+                    await readFromLocalFile();
+                    return;
+                }
+                logEl.textContent = `Gagal memuat log dari server (${e.message}). Anda bisa klik "Open Local Log…" untuk memilih file lokal.`;
+                logEl.classList.add('text-danger');
+            }
+        }
+
+        function renderLog(data) {
+            const { totalLines, returnedLines, lines } = data;
+            const html = lines.map(safeLine).join('\n');
+            logEl.textContent = html; // preformatted
+            metaEl.textContent = `total: ${totalLines} lines, showing last ${returnedLines}`;
+            // Auto scroll to bottom when live
+            if (refreshSelect.value !== '0') {
+                logEl.scrollTop = logEl.scrollHeight;
+            }
+        }
+
+        function safeLine(line) {
+            return line || '';
+        }
+
+        function applyRefresh() {
+            if (timer) {
+                clearInterval(timer);
+                timer = null;
+            }
+            const sec = parseInt(refreshSelect.value, 10) || 0;
+            if (sec > 0) {
+                liveBadge.classList.remove('badge-paused');
+                liveBadge.classList.add('badge-live');
+                liveBadge.textContent = 'LIVE';
+                timer = setInterval(async () => {
+                    if (fileHandle) {
+                        await readFromLocalFile();
+                    } else {
+                        await fetchLog();
+                    }
+                }, sec * 1000);
+            } else {
+                liveBadge.classList.remove('badge-live');
+                liveBadge.classList.add('badge-paused');
+                liveBadge.textContent = 'PAUSED';
+            }
+        }
+
+        document.getElementById('btnRefresh').addEventListener('click', fetchLog);
+        document.getElementById('btnTop').addEventListener('click', () => { logEl.scrollTop = 0; });
+        document.getElementById('btnBottom').addEventListener('click', () => { logEl.scrollTop = logEl.scrollHeight; });
+        refreshSelect.addEventListener('change', applyRefresh);
+        maxLinesEl.addEventListener('change', fetchLog);
+
+        // Local file support (File System Access API with fallback)
+        btnOpenLocal.addEventListener('click', async () => {
+            try {
+                if ('showOpenFilePicker' in window) {
+                    const [handle] = await window.showOpenFilePicker({
+                        multiple: false,
+                        types: [{
+                            description: 'Log files',
+                            accept: { 'text/plain': ['.log', '.txt'] }
+                        }]
+                    });
+                    fileHandle = handle;
+                    await readFromLocalFile();
+                    applyRefresh();
+                } else {
+                    fileInput.click();
+                }
+            } catch (err) {
+                // User cancelled
+            }
+        });
+
+        fileInput.addEventListener('change', async (e) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+            const text = await file.text();
+            renderLocalText(text);
+            applyRefresh();
+        });
+
+        async function readFromLocalFile() {
+            try {
+                if (!fileHandle) return;
+                const file = await fileHandle.getFile();
+                const text = await file.text();
+                renderLocalText(text);
+            } catch (err) {
+                // Possibly permissions revoked
+                metaEl.textContent = 'Cannot read local file';
+            }
+        }
+
+        function renderLocalText(text) {
+            const lines = text.split(/\r?\n/);
+            const max = parseInt(maxLinesEl.value, 10) || 1000;
+            const slice = lines.slice(-max);
+            logEl.textContent = slice.join('\n');
+            metaEl.textContent = `local file • total: ${lines.length} lines, showing last ${slice.length}`;
+            if (refreshSelect.value !== '0') {
+                logEl.scrollTop = logEl.scrollHeight;
+            }
+        }
+
+        // init
+        fetchLog();
+        applyRefresh();
+    </script>
+</body>
+
+</html>

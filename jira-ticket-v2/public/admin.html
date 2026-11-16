@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #0d6efd;
+            --secondary-color: #6c757d;
+            --dark-blue: #040433;
+            --light-bg: #f4f7f6;
+            --sidebar-width: 250px;
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--light-bg);
+            color: #333;
+            margin: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: white;
+            color: #333;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem 0;
+            z-index: 1001;
+            transition: var(--transition);
+            border-right: 1px solid #e0e0e0;
+        }
+
+        .sidebar-brand {
+            padding: 1.5rem 1rem 2rem;
+            text-align: center;
+            border-bottom: 1px solid #f0f0f0;
+            margin-bottom: 1rem;
+        }
+
+        .sidebar-brand img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .sidebar-brand p {
+            color: var(--dark-blue);
+        }
+
+        .sidebar-nav {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            flex-grow: 1;
+        }
+
+        .sidebar-nav-item {
+            margin-bottom: 0.25rem;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 1.5rem;
+            color: #666;
+            text-decoration: none;
+            transition: var(--transition);
+            border-left: 4px solid transparent;
+        }
+
+        .sidebar-link:hover,
+        .sidebar-link.active {
+            background: #f8f9fa;
+            color: var(--primary-color);
+            border-left-color: var(--primary-color);
+        }
+
+        .sidebar-link i {
+            margin-right: 12px;
+            font-size: 1.2rem;
+        }
+
+        .sidebar-footer {
+            padding: 1.5rem;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .sidebar-footer .btn {
+            color: var(--secondary-color);
+            border-color: #dee2e6;
+        }
+
+        .sidebar-footer .btn:hover {
+            background-color: #f8f9fa;
+            color: #dc3545;
+            border-color: #dc3545;
+        }
+
+        /* Main Content Styling */
+        .main-content {
+            flex-grow: 1;
+            margin-left: var(--sidebar-width);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            width: calc(100% - var(--sidebar-width));
+        }
+
+        .top-navbar {
+            background-color: white;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .page-content {
+            padding: 2rem;
+            flex-grow: 1;
+        }
+
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        }
+
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid #f0f0f0;
+            padding: 1.25rem 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+
+        .card-header i {
+            margin-right: 10px;
+            color: var(--primary-color);
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* Form Controls */
+        .form-control,
+        .form-select {
+            border-radius: 8px;
+            padding: 0.6rem 1rem;
+            border: 1px solid #dee2e6;
+        }
+
+        .form-control:focus {
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+        }
+
+        .btn {
+            border-radius: 8px;
+            padding: 0.6rem 1.2rem;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+        }
+
+        .btn-success {
+            background-color: #198754;
+            border: none;
+        }
+
+        .btn-info {
+            background-color: #0dcaf0;
+            border: none;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Stats Cards */
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-right: 1rem;
+        }
+
+        /* Table Styling */
+        .table thead th {
+            background-color: #f8f9fa;
+            border-top: none;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+            padding: 1rem;
+        }
+
+        .table td {
+            vertical-align: middle;
+            padding: 1rem;
+        }
+
+        #logsContent {
+            font-family: 'JetBrains Mono', 'Consolas', monospace;
+            font-size: 0.8rem;
+            line-height: 1.5;
+        }
+
+        .footer {
+            background-color: white;
+            border-top: 1px solid #f0f0f0;
+            padding: 1.5rem 2rem;
+            color: var(--secondary-color);
+            text-align: center;
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 70px;
+            }
+
+            .sidebar-link span,
+            .sidebar-brand span {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 70px;
+                width: calc(100% - 70px);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <img src="/logo-update.svg" alt="RWC Logo" style="width: 120px; height: auto;">
+            <p class="mt-3 small fw-bold mb-0">ADMIN PANEL</p>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="sidebar-nav-item">
+                <a href="#report-section" class="sidebar-link active">
+                    <i class="bi bi-file-earmark-text"></i>
+                    <span>Summary</span>
+                </a>
+            </div>
+            <div class="sidebar-nav-item">
+                <a href="#logs-section" class="sidebar-link">
+                    <i class="bi bi-journal-text"></i>
+                    <span>System Logs</span>
+                </a>
+            </div>
+            <div class="sidebar-nav-item">
+                <a href="#countries-section" class="sidebar-link">
+                    <i class="bi bi-globe"></i>
+                    <span>Countries</span>
+                </a>
+            </div>
+            <div class="sidebar-nav-item d-none" id="usersNavItem">
+                <a href="#users-section" class="sidebar-link">
+                    <i class="bi bi-people"></i>
+                    <span>User Management</span>
+                </a>
+            </div>
+            <div class="sidebar-nav-item mt-4">
+                <a href="index.html" class="sidebar-link">
+                    <i class="bi bi-arrow-left-circle"></i>
+                    <span>Public Dashboard</span>
+                </a>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="btn btn-sm btn-outline-light w-100" onclick="logout()">
+                <i class="bi bi-box-arrow-right"></i> <span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Navbar -->
+        <header class="top-navbar">
+            <div class="navbar-left">
+                <h4 class="mb-0 fw-bold">Dashboard</h4>
+            </div>
+            <div class="navbar-right d-flex align-items-center">
+                <div class="me-3 text-end d-none d-md-block">
+                    <p class="mb-0 small fw-bold" id="adminUser">Admin</p>
+                    <p class="mb-0 smaller text-muted" id="adminRoleLabel">System Administrator</p>
+                </div>
+                <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
+                    style="width: 40px; height: 40px;">
+                    <i class="bi bi-person"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- Page Content -->
+        <div class="page-content">
+
+            <section id="report-section">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="bi bi-file-earmark-check"></i> Monthly Report Generation
+                            </div>
+                            <div class="card-body">
+                                <form id="monthlyReportForm">
+                                    <div class="row g-3 align-items-center">
+                                        <div class="col-md-7">
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-light border-end-0"><i
+                                                        class="bi bi-calendar-event text-primary"></i></span>
+                                                <input type="month" class="form-control border-start-0" id="reportMonth"
+                                                    required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <button type="submit" id="generateReportBtn"
+                                                class="btn btn-primary w-100 d-flex align-items-center justify-content-center">
+                                                <i class="bi bi-file-earmark-word me-2"></i> <span>Generate DOCX
+                                                    Report</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="form-text mt-3 text-muted">
+                                        <i class="bi bi-info-circle me-1"></i> Official monthly report including data
+                                        tables and visualization charts.
+                                    </div>
+                                </form>
+                                <div id="reportStatus" class="mt-4"></div>
+
+                                <div class="p-3 border rounded-3 bg-light mt-4">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-8">
+                                            <h6 class="fw-bold mb-1">Bulk Chart Export</h6>
+                                            <p class="text-muted small mb-0">Download all generated monthly charts in a
+                                                ZIP archive.</p>
+                                        </div>
+                                        <div class="col-md-4 text-end">
+                                            <button type="button" class="btn btn-outline-primary btn-sm px-4"
+                                                onclick="downloadChart()">
+                                                <i class="bi bi-file-earmark-zip me-1"></i> Export Charts
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="chartStatus" class="mt-3"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="logs-section">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bi bi-terminal"></i> Scrape & Operations Log
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3 align-items-end mb-4">
+                            <div class="col-md-8">
+                                <label for="logLines" class="form-label">Lines to Fetch</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-list-ul"></i></span>
+                                    <input type="number" class="form-control" id="logLines" value="50" min="10"
+                                        max="5000">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <button type="button" class="btn btn-info w-100" onclick="loadLogs()">
+                                    <i class="bi bi-search me-2"></i> View System Logs
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="logsContainer" style="display: none;">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="badge bg-light text-dark border" id="logsInfo"></span>
+                                <button class="btn btn-sm btn-link text-decoration-none" onclick="loadLogs()">
+                                    <i class="bi bi-arrow-clockwise"></i> Refresh Logs
+                                </button>
+                            </div>
+                            <div class="border rounded bg-dark p-3">
+                                <pre id="logsContent" class="mb-0 text-white-50"
+                                    style="max-height: 500px; overflow-y: auto;"></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="countries-section">
+                <div class="row">
+                    <!-- Add Country -->
+                    <div class="col-lg-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="bi bi-plus-circle"></i> Add Country
+                            </div>
+                            <div class="card-body">
+                                <form id="addCountryForm">
+                                    <div class="mb-3">
+                                        <label for="countryName" class="form-label">Full Name</label>
+                                        <input type="text" class="form-control" id="countryName"
+                                            placeholder="e.g., Thailand" required>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="countryCode" class="form-label">Identify Code</label>
+                                        <input type="text" class="form-control" id="countryCode" placeholder="e.g., TH"
+                                            required>
+                                        <div class="form-text">Used for searching in Jira summaries.</div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary w-100">Register Country</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Country List -->
+                    <div class="col-lg-8">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <span><i class="bi bi-list-stars"></i> Registered Countries</span>
+                                <button id="refreshCountries" class="btn btn-sm btn-light border">
+                                    <i class="bi bi-arrow-clockwise"></i>
+                                </button>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th class="ps-4">ID</th>
+                                                <th>Country Name</th>
+                                                <th>Code</th>
+                                                <th class="text-end pe-4">Options</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="countriesTable">
+                                            <!-- Data filled via JS -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="users-section" class="d-none">
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="bi bi-person-gear"></i> Monitoring User Form
+                            </div>
+                            <div class="card-body">
+                                <form id="monitoringUserForm">
+                                    <input type="hidden" id="monitoringUserId">
+                                    <div class="mb-3">
+                                        <label for="monitoringUserEmail" class="form-label">Email</label>
+                                        <input type="email" class="form-control" id="monitoringUserEmail" placeholder="e.g., nfp.indonesia@rwc.local" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="monitoringUserPassword" class="form-label">Password</label>
+                                        <input type="text" class="form-control" id="monitoringUserPassword" placeholder="Leave blank when editing to keep current password">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="monitoringUserDisplayName" class="form-label">Display Name</label>
+                                        <input type="text" class="form-control" id="monitoringUserDisplayName" placeholder="e.g., NFP WDQMS Indonesia">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="monitoringUserRole" class="form-label">Role</label>
+                                        <select class="form-select" id="monitoringUserRole" required>
+                                            <option value="user">User</option>
+                                            <option value="admin">Admin</option>
+                                            <option value="super_admin">Super Admin</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3" id="monitoringUserCountryGroup">
+                                        <label for="monitoringUserCountry" class="form-label">Country Access</label>
+                                        <select class="form-select" id="monitoringUserCountry">
+                                            <option value="">Select country</option>
+                                        </select>
+                                        <div class="form-text">Required for user role. Admin and super admin ignore country access.</div>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="monitoringUserActive" class="form-label">Status</label>
+                                        <select class="form-select" id="monitoringUserActive">
+                                            <option value="1">Active</option>
+                                            <option value="0">Inactive</option>
+                                        </select>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <button type="submit" class="btn btn-primary flex-grow-1" id="monitoringUserSubmitBtn">Create User</button>
+                                        <button type="button" class="btn btn-outline-secondary" id="monitoringUserResetBtn">Reset</button>
+                                    </div>
+                                </form>
+                                <div id="monitoringUserFormStatus" class="mt-3"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-8">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <span><i class="bi bi-people-fill"></i> Monitoring Users</span>
+                                <button id="refreshMonitoringUsers" class="btn btn-sm btn-light border">
+                                    <i class="bi bi-arrow-clockwise"></i>
+                                </button>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th class="ps-4">Display Name</th>
+                                                <th>Email</th>
+                                                <th>Role</th>
+                                                <th>Country</th>
+                                                <th>Status</th>
+                                                <th class="text-end pe-4">Options</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="monitoringUsersTable">
+                                            <tr>
+                                                <td colspan="6" class="text-center">Loading users...</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                        <p class="mb-0">© <span id="currentYearFooter">2024</span> Badan Meteorologi, Klimatologi, dan
+                            Geofisika (BMKG)</p>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Update tahun secara otomatis di footer
+        document.getElementById('currentYearFooter').textContent = new Date().getFullYear();
+        let adminSession = null;
+        let adminCountriesCache = [];
+        let monitoringUsersCache = [];
+
+        // Smooth scroll for sidebar links
+        document.querySelectorAll('.sidebar-link[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    window.scrollTo({
+                        top: target.offsetTop - 90,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Function to check authentication
+        async function checkAuth() {
+            const token = localStorage.getItem('adminToken');
+            if (!token) {
+                window.location.href = 'admin-login.html';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/admin/verify', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    localStorage.removeItem('adminToken');
+                    localStorage.removeItem('adminUser');
+                    localStorage.removeItem('adminSession');
+                    window.location.href = 'admin-login.html';
+                    return;
+                }
+
+                const data = await response.json();
+                adminSession = data.user;
+                localStorage.setItem('adminUser', adminSession.displayName || adminSession.email);
+                localStorage.setItem('adminSession', JSON.stringify(adminSession));
+
+                document.getElementById('adminUser').textContent = adminSession.displayName || adminSession.email;
+                document.getElementById('adminRoleLabel').textContent = formatRoleLabel(adminSession.role);
+
+                toggleSuperAdminSections(adminSession.role === 'super_admin');
+                await loadCountries();
+                setupEventListeners();
+                if (adminSession.role === 'super_admin') {
+                    await loadMonitoringUsers();
+                }
+            } catch (error) {
+                console.error('Auth check failed:', error);
+                localStorage.removeItem('adminToken');
+                localStorage.removeItem('adminUser');
+                localStorage.removeItem('adminSession');
+                window.location.href = 'admin-login.html';
+            }
+        }
+
+        // Function to get auth headers
+        function getAuthHeaders() {
+            const token = localStorage.getItem('adminToken');
+            return {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            };
+        }
+
+        // Function to logout
+        async function logout() {
+            try {
+                await fetch('/api/admin/logout', {
+                    method: 'POST',
+                    headers: getAuthHeaders()
+                });
+            } catch (error) {
+                console.error('Logout error:', error);
+            } finally {
+                localStorage.removeItem('adminToken');
+                localStorage.removeItem('adminUser');
+                localStorage.removeItem('adminSession');
+                window.location.href = 'admin-login.html';
+            }
+        }
+
+        function formatRoleLabel(role) {
+            switch (role) {
+                case 'super_admin':
+                    return 'Super Administrator';
+                case 'admin':
+                    return 'Administrator';
+                default:
+                    return 'System Administrator';
+            }
+        }
+
+        function toggleSuperAdminSections(isSuperAdmin) {
+            document.getElementById('users-section')?.classList.toggle('d-none', !isSuperAdmin);
+            document.getElementById('usersNavItem')?.classList.toggle('d-none', !isSuperAdmin);
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Handle form submit
+            document.getElementById('addCountryForm').addEventListener('submit', function (e) {
+                e.preventDefault();
+                addCountry();
+            });
+
+            // Handle refresh button
+            document.getElementById('refreshCountries').addEventListener('click', loadCountries);
+
+            // Handle monthly report form submit
+            document.getElementById('monthlyReportForm').addEventListener('submit', function (e) {
+                e.preventDefault();
+                generateMonthlyReport();
+            });
+
+            const monitoringUserForm = document.getElementById('monitoringUserForm');
+            if (monitoringUserForm && !monitoringUserForm.dataset.bound) {
+                monitoringUserForm.addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    saveMonitoringUser();
+                });
+                monitoringUserForm.dataset.bound = 'true';
+            }
+
+            document.getElementById('monitoringUserResetBtn')?.addEventListener('click', resetMonitoringUserForm);
+            document.getElementById('refreshMonitoringUsers')?.addEventListener('click', loadMonitoringUsers);
+            document.getElementById('monitoringUserRole')?.addEventListener('change', toggleMonitoringUserCountryField);
+        }
+
+        // Fungsi untuk load semua countries
+        async function loadCountries() {
+            try {
+                const response = await fetch('/api/admin/countries', {
+                    headers: getAuthHeaders()
+                });
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        window.location.href = 'admin-login.html';
+                        return;
+                    }
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const countries = await response.json();
+                adminCountriesCache = countries;
+                populateMonitoringCountryOptions();
+
+                const tbody = document.getElementById('countriesTable');
+                tbody.innerHTML = '';
+
+                if (countries.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="text-center">No countries found</td></tr>';
+                    return;
+                }
+
+                countries.forEach(country => {
+                    const row = `
+                        <tr>
+                            <td>${country.id}</td>
+                            <td>${country.name}</td>
+                            <td>${country.country_code}</td>
+                            <td>
+                                <button class="btn btn-sm btn-danger" onclick="deleteCountry(${country.id})">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+            } catch (error) {
+                console.error('Error loading countries:', error);
+                alert('Error loading countries: ' + error.message);
+            }
+        }
+
+        function populateMonitoringCountryOptions() {
+            const countrySelect = document.getElementById('monitoringUserCountry');
+            if (!countrySelect) return;
+
+            const currentValue = countrySelect.value;
+            countrySelect.innerHTML = '<option value="">Select country</option>';
+            adminCountriesCache.forEach((country) => {
+                const option = document.createElement('option');
+                option.value = JSON.stringify({
+                    name: country.name,
+                    code: country.country_code
+                });
+                option.textContent = country.name;
+                countrySelect.appendChild(option);
+            });
+
+            if ([...countrySelect.options].some((option) => option.value === currentValue)) {
+                countrySelect.value = currentValue;
+            }
+        }
+
+        function toggleMonitoringUserCountryField() {
+            const roleSelect = document.getElementById('monitoringUserRole');
+            const countryGroup = document.getElementById('monitoringUserCountryGroup');
+            const countrySelect = document.getElementById('monitoringUserCountry');
+            const isUserRole = roleSelect?.value === 'user';
+
+            countryGroup?.classList.toggle('opacity-50', !isUserRole);
+            if (countrySelect) {
+                countrySelect.disabled = !isUserRole;
+                if (!isUserRole) {
+                    countrySelect.value = '';
+                }
+            }
+        }
+
+        function resetMonitoringUserForm() {
+            document.getElementById('monitoringUserId').value = '';
+            document.getElementById('monitoringUserEmail').value = '';
+            document.getElementById('monitoringUserPassword').value = '';
+            document.getElementById('monitoringUserDisplayName').value = '';
+            document.getElementById('monitoringUserRole').value = 'user';
+            document.getElementById('monitoringUserActive').value = '1';
+            document.getElementById('monitoringUserCountry').value = '';
+            document.getElementById('monitoringUserSubmitBtn').textContent = 'Create User';
+            document.getElementById('monitoringUserFormStatus').innerHTML = '';
+            toggleMonitoringUserCountryField();
+        }
+
+        function showMonitoringUserStatus(message, type) {
+            const container = document.getElementById('monitoringUserFormStatus');
+            if (!container) return;
+            container.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+        }
+
+        function getMonitoringUserPayload() {
+            const role = document.getElementById('monitoringUserRole').value;
+            const countryRaw = document.getElementById('monitoringUserCountry').value;
+            const selectedCountry = countryRaw ? JSON.parse(countryRaw) : null;
+
+            return {
+                email: document.getElementById('monitoringUserEmail').value.trim(),
+                password: document.getElementById('monitoringUserPassword').value,
+                displayName: document.getElementById('monitoringUserDisplayName').value.trim(),
+                role,
+                accessCountryName: role === 'user' ? selectedCountry?.name || '' : '',
+                accessCountryCode: role === 'user' ? selectedCountry?.code || '' : '',
+                isActive: document.getElementById('monitoringUserActive').value === '1'
+            };
+        }
+
+        async function loadMonitoringUsers() {
+            if (adminSession?.role !== 'super_admin') {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/admin/monitoring-users', {
+                    headers: getAuthHeaders()
+                });
+                if (!response.ok) {
+                    if (response.status === 403) {
+                        toggleSuperAdminSections(false);
+                        return;
+                    }
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const users = await response.json();
+                monitoringUsersCache = users;
+                renderMonitoringUsers(users);
+            } catch (error) {
+                console.error('Error loading monitoring users:', error);
+                const tbody = document.getElementById('monitoringUsersTable');
+                if (tbody) {
+                    tbody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">Error loading users: ${error.message}</td></tr>`;
+                }
+            }
+        }
+
+        function renderMonitoringUsers(users) {
+            const tbody = document.getElementById('monitoringUsersTable');
+            if (!tbody) return;
+
+            tbody.innerHTML = '';
+            if (!users.length) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center">No monitoring users found</td></tr>';
+                return;
+            }
+
+            users.forEach((user) => {
+                const countryText = user.accessCountryName || '-';
+                const roleBadgeClass = user.role === 'super_admin'
+                    ? 'bg-danger-subtle text-danger-emphasis'
+                    : user.role === 'admin'
+                        ? 'bg-primary-subtle text-primary-emphasis'
+                        : 'bg-secondary-subtle text-secondary-emphasis';
+                const statusBadgeClass = user.isActive ? 'bg-success-subtle text-success-emphasis' : 'bg-secondary-subtle text-secondary-emphasis';
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="ps-4">${escapeHtml(user.displayName || '-')}</td>
+                        <td>${escapeHtml(user.email)}</td>
+                        <td><span class="badge ${roleBadgeClass}">${escapeHtml(user.role)}</span></td>
+                        <td>${escapeHtml(countryText)}</td>
+                        <td><span class="badge ${statusBadgeClass}">${user.isActive ? 'Active' : 'Inactive'}</span></td>
+                        <td class="text-end pe-4">
+                            <button class="btn btn-sm btn-outline-primary me-2" onclick="editMonitoringUser(${user.id})">Edit</button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteMonitoringUser(${user.id})">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function editMonitoringUser(id) {
+            const user = monitoringUsersCache.find((item) => item.id === id);
+            if (!user) return;
+
+            document.getElementById('monitoringUserId').value = user.id;
+            document.getElementById('monitoringUserEmail').value = user.email;
+            document.getElementById('monitoringUserPassword').value = '';
+            document.getElementById('monitoringUserDisplayName').value = user.displayName || '';
+            document.getElementById('monitoringUserRole').value = user.role;
+            document.getElementById('monitoringUserActive').value = user.isActive ? '1' : '0';
+
+            populateMonitoringCountryOptions();
+            const countrySelect = document.getElementById('monitoringUserCountry');
+            if (user.accessCountryName && countrySelect) {
+                const matchedOption = [...countrySelect.options].find((option) => {
+                    if (!option.value) return false;
+                    try {
+                        return JSON.parse(option.value).name === user.accessCountryName;
+                    } catch (error) {
+                        return false;
+                    }
+                });
+                countrySelect.value = matchedOption ? matchedOption.value : '';
+            } else if (countrySelect) {
+                countrySelect.value = '';
+            }
+
+            document.getElementById('monitoringUserSubmitBtn').textContent = 'Update User';
+            toggleMonitoringUserCountryField();
+            showMonitoringUserStatus(`Editing ${escapeHtml(user.displayName || user.email)}`, 'info');
+            window.scrollTo({ top: document.getElementById('users-section').offsetTop - 80, behavior: 'smooth' });
+        }
+
+        async function saveMonitoringUser() {
+            const userId = document.getElementById('monitoringUserId').value;
+            const payload = getMonitoringUserPayload();
+            const isEditing = Boolean(userId);
+
+            if (!payload.email) {
+                showMonitoringUserStatus('Email is required', 'danger');
+                return;
+            }
+
+            if (!isEditing && !payload.password) {
+                showMonitoringUserStatus('Password is required for new users', 'danger');
+                return;
+            }
+
+            if (payload.role === 'user' && !payload.accessCountryName) {
+                showMonitoringUserStatus('Country is required for user role', 'danger');
+                return;
+            }
+
+            try {
+                const response = await fetch(isEditing ? `/api/admin/monitoring-users/${userId}` : '/api/admin/monitoring-users', {
+                    method: isEditing ? 'PUT' : 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                if (!response.ok) {
+                    throw new Error(result.message || 'Failed to save user');
+                }
+
+                showMonitoringUserStatus(result.message, 'success');
+                resetMonitoringUserForm();
+                await loadMonitoringUsers();
+            } catch (error) {
+                console.error('Error saving monitoring user:', error);
+                showMonitoringUserStatus(error.message, 'danger');
+            }
+        }
+
+        async function deleteMonitoringUser(id) {
+            const user = monitoringUsersCache.find((item) => item.id === id);
+            if (!user) return;
+
+            if (!confirm(`Delete user ${user.displayName || user.email}?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/admin/monitoring-users/${id}`, {
+                    method: 'DELETE',
+                    headers: getAuthHeaders()
+                });
+                const result = await response.json();
+                if (!response.ok) {
+                    throw new Error(result.message || 'Failed to delete user');
+                }
+
+                showMonitoringUserStatus(result.message, 'success');
+                await loadMonitoringUsers();
+                if (String(document.getElementById('monitoringUserId').value) === String(id)) {
+                    resetMonitoringUserForm();
+                }
+            } catch (error) {
+                console.error('Error deleting monitoring user:', error);
+                showMonitoringUserStatus(error.message, 'danger');
+            }
+        }
+
+        function escapeHtml(value) {
+            return String(value || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        // Fungsi untuk menambah country
+        async function addCountry() {
+            const nameInput = document.getElementById('countryName');
+            const codeInput = document.getElementById('countryCode');
+            const name = nameInput.value.trim();
+            const country_code = codeInput.value.trim();
+
+            if (!name || !country_code) {
+                alert('Please fill both country name and code');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/admin/countries', {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify({ name, country_code })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert('Country added successfully');
+                    nameInput.value = '';
+                    codeInput.value = '';
+                    loadCountries(); // Refresh list
+
+                    // Notify other tabs about countries update
+                    localStorage.setItem('countriesUpdated', Date.now().toString());
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Error adding country:', error);
+                alert('Error adding country: ' + error.message);
+            }
+        }
+
+        // Fungsi untuk menghapus country
+        async function deleteCountry(id) {
+            if (!confirm('Are you sure you want to delete this country?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/admin/countries/${id}`, {
+                    method: 'DELETE',
+                    headers: getAuthHeaders()
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert('Country deleted successfully');
+                    loadCountries(); // Refresh list
+
+                    // Notify other tabs about countries update
+                    localStorage.setItem('countriesUpdated', Date.now().toString());
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Error deleting country:', error);
+                alert('Error deleting country: ' + error.message);
+            }
+        }
+
+        // Fungsi untuk load logs
+        async function loadLogs() {
+            const logsContainer = document.getElementById('logsContainer');
+            const logsContent = document.getElementById('logsContent');
+            const logsInfo = document.getElementById('logsInfo');
+            const logLines = document.getElementById('logLines').value || 100;
+
+            logsContainer.style.display = 'block';
+            logsContent.textContent = 'Loading logs...';
+            logsInfo.textContent = '';
+
+            try {
+                const response = await fetch(`/api/logs/scrape?lines=${logLines}`, {
+                    headers: getAuthHeaders()
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (data.lines && data.lines.length > 0) {
+                    logsContent.textContent = data.lines.join('\n');
+                    logsInfo.textContent = `Showing ${data.returnedLines} of ${data.totalLines} total lines`;
+
+                    // Auto-scroll to bottom of logs
+                    setTimeout(() => {
+                        const pre = document.getElementById('logsContent');
+                        pre.scrollTop = pre.scrollHeight;
+                    }, 100);
+                } else {
+                    logsContent.textContent = 'No logs available';
+                    logsInfo.textContent = '';
+                }
+            } catch (error) {
+                console.error('Error loading logs:', error);
+                logsContent.textContent = 'Error loading logs: ' + error.message;
+                logsInfo.textContent = '';
+            }
+        }
+
+        // Fungsi untuk generate monthly report
+        async function generateMonthlyReport() {
+            const monthInput = document.getElementById('reportMonth');
+            const statusDiv = document.getElementById('reportStatus');
+            const generateBtn = document.getElementById('generateReportBtn');
+            const month = monthInput.value;
+
+            if (!month) {
+                statusDiv.innerHTML = '<div class="alert alert-danger">Please select a month first</div>';
+                return;
+            }
+
+            if (generateBtn?.disabled) {
+                return;
+            }
+
+            // Convert month input to Indonesian format
+            const [year, monthNum] = month.split('-');
+            const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+                'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+            const bulanIndonesia = monthNames[parseInt(monthNum) - 1];
+
+            statusDiv.innerHTML = '<div class="alert alert-info">Generating report...</div>';
+            if (generateBtn) {
+                generateBtn.disabled = true;
+                generateBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span><span>Generating...</span>';
+            }
+
+            try {
+                const token = localStorage.getItem('adminToken');
+                if (!token) {
+                    statusDiv.innerHTML = '<div class="alert alert-danger">Token not found, please login again</div>';
+                    return;
+                }
+
+                const response = await fetch('/api/admin/monthly-report', {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify({ bulan: bulanIndonesia, tahun: year })
+                });
+
+                if (!response.ok) {
+                    let errorMessage = `Error ${response.status}`;
+                    try {
+                        const errorData = await response.json();
+                        errorMessage = errorData.message || errorData.error || errorMessage;
+                    } catch (_) {
+                        errorMessage = await response.text();
+                    }
+                    statusDiv.innerHTML = `<div class="alert alert-danger">${errorMessage}</div>`;
+                    return;
+                }
+
+                const blob = await response.blob();
+                statusDiv.innerHTML = '<div class="alert alert-success">Report generated successfully! File will be downloaded automatically.</div>';
+
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                const monthEnglish = ['January','February','March','April','May','June','July','August','September','October','November','December'][parseInt(monthNum) - 1];
+                link.download = `Monthly_Report_${monthEnglish}_${year}.docx`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            } catch (error) {
+                console.error('Error generating monthly report:', error);
+                statusDiv.innerHTML = '<div class="alert alert-danger">Error generating monthly report: ' + error.message + '</div>';
+            } finally {
+                if (generateBtn) {
+                    generateBtn.disabled = false;
+                    generateBtn.innerHTML = '<i class="bi bi-file-earmark-word me-2"></i> <span>Generate DOCX Report</span>';
+                }
+            }
+        }
+
+        // Fungsi untuk download semua chart dalam 1 file ZIP
+        async function downloadChart() {
+            const monthInput = document.getElementById('reportMonth');
+            const chartStatusDiv = document.getElementById('chartStatus');
+            const month = monthInput.value;
+
+            if (!month) {
+                chartStatusDiv.innerHTML = '<div class="alert alert-danger">Please select a month first</div>';
+                return;
+            }
+
+            // Convert month input to Indonesian format
+            const [year, monthNum] = month.split('-');
+            const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+                'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+            const bulanIndonesia = monthNames[parseInt(monthNum) - 1];
+
+            chartStatusDiv.innerHTML = '<div class="alert alert-info">Creating ZIP file of all charts...</div>';
+
+            try {
+                const token = localStorage.getItem('adminToken');
+                if (!token) {
+                    chartStatusDiv.innerHTML = '<div class="alert alert-danger">Token not found, please login again</div>';
+                    return;
+                }
+
+                const response = await fetch(`/api/admin/download-all-charts/${bulanIndonesia}/${year}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    chartStatusDiv.innerHTML = `<div class="alert alert-danger">${errorData.message || errorData.error}</div>`;
+                    return;
+                }
+
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `Laporan_Charts_${bulanIndonesia}_${year}.zip`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+
+                chartStatusDiv.innerHTML = '<div class="alert alert-success">ZIP file downloaded successfully!</div>';
+
+                // Clear status after 3 seconds
+                setTimeout(() => {
+                    chartStatusDiv.innerHTML = '';
+                }, 3000);
+            } catch (error) {
+                console.error('Error downloading charts:', error);
+                chartStatusDiv.innerHTML = '<div class="alert alert-danger">Error downloading charts: ' + error.message + '</div>';
+            }
+        }
+
+        // Check authentication on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            checkAuth();
+        });
+    </script>
+</body>
+
+</html>
