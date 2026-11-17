@@ -5,7 +5,7 @@ const path = require('path');
 
 const router = express.Router();
 
-const LANDING_DIR = path.join(__dirname, '../../landingpage');
+const LANDING_DIR = path.join(__dirname, '../../../landingpage');
 
 router.get('/log', (req, res) => {
     res.status(404).send('Not Found');
