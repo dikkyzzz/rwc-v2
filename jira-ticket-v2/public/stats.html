@@ -772,7 +772,7 @@
 
                     const counts = {};
                     issues.forEach(issue => {
-                        const summary = issue.summary?.toLowerCase() || '';
+                        const summary = normalizeSummaryForCountry(issue.summary?.toLowerCase() || '');
                         for (const [key, name] of Object.entries(countries)) {
                             if (matchesCountryToken(summary, key)) {
                                 counts[name] = (counts[name] || 0) + 1;
@@ -790,10 +790,29 @@
             // Fungsi untuk menghitung issues per country dan status berdasarkan data yang difilter
             // Country codes are matched as whole tokens: a plain
             // summary.includes('us') matched "Muscat" and filed Oman under US.
+            // Known misspellings in Jira summaries. Jira is third-party input
+            // and cannot be corrected here, so normalise on read.
+            const COUNTRY_ALIASES = {
+                philipines: 'philippines',
+                phillipines: 'philippines',
+            };
+
+            function normalizeSummaryForCountry(summary) {
+                let out = summary;
+                for (const [wrong, right] of Object.entries(COUNTRY_ALIASES)) {
+                    out = out.split(wrong).join(right);
+                }
+                return out;
+            }
+
             function matchesCountryToken(summary, needle) {
                 if (!needle) return false;
                 const escaped = needle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                return new RegExp(`(^|[^a-z0-9])${escaped}([^a-z0-9]|$)`, 'i').test(summary);
+                // Require a boundary BEFORE the token, so "us" no longer matches
+                // "Muscat". No boundary after: the US entry is literally "us-"
+                // ("10102024-US-KAHULUI..."), and demanding a non-alphanumeric
+                // right after the dash silently dropped nine US tickets.
+                return new RegExp(`(^|[^a-z0-9])${escaped}`, 'i').test(summary);
             }
 
             async function countIssuesByCountryAndStatus(issues) {
@@ -814,7 +833,7 @@
 
                     const countryStatusCounts = {};
                     issues.forEach(issue => {
-                        const summary = issue.summary?.toLowerCase() || '';
+                        const summary = normalizeSummaryForCountry(issue.summary?.toLowerCase() || '');
                         let foundCountryKey = null;
 
                         // Cari berdasarkan country_code dan name
@@ -952,7 +971,7 @@
                     // Hitung issues per country dan category
                     const countryCategoryCounts = {};
                     issues.forEach(issue => {
-                        const summary = issue.summary?.toLowerCase() || '';
+                        const summary = normalizeSummaryForCountry(issue.summary?.toLowerCase() || '');
                         const category = issue.wigosIssueCategory?.toLowerCase().trim() || 'unknown';
 
                         let foundCountryKey = null;
@@ -1170,7 +1189,7 @@
             function buildSummaryRows(issues) {
                 const rows = new Map();
                 issues.forEach(issue => {
-                    const summary = (issue.summary || '').toLowerCase();
+                    const summary = normalizeSummaryForCountry((issue.summary || '').toLowerCase());
                     let country = 'Outside country list';
                     for (const [key, name] of Object.entries(COUNTRIES)) {
                         if (matchesCountryToken(summary, key)) { country = name; break; }
