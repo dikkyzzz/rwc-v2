@@ -177,6 +177,46 @@
             text-decoration: none;
         }
 
+        /* Chart cards: a fixed-height canvas area so Chart.js sizes itself
+           consistently instead of collapsing to its attribute height. */
+        .chart-card {
+            position: relative;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            box-shadow: 0 6px 20px rgba(19, 49, 95, 0.06);
+            padding: 18px 18px 12px;
+            height: 100%;
+            transition: box-shadow 0.25s ease, transform 0.25s ease;
+        }
+
+        .chart-card:hover {
+            box-shadow: 0 12px 32px rgba(19, 49, 95, 0.10);
+        }
+
+        .chart-card-title {
+            color: var(--primary-dark);
+            font-size: 1rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .chart-canvas-wrap {
+            position: relative;
+            height: 320px;
+        }
+
+        .chart-card-foot {
+            text-align: right;
+            margin-top: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .chart-canvas-wrap { height: 260px; }
+            .chart-card { padding: 14px 12px 10px; }
+        }
+
         .footer-grid {
             display: grid;
             grid-template-columns: 2fr 1fr 1fr 1fr;
@@ -496,19 +536,27 @@
             </div>
             <!-- Grafik Total Ticket per Negara -->
             <div class="col-md-6 mt-4">
-                <h5 class="text-center mb-3" id="countryChartTitle">Total Tickets by Country</h5>
-                <canvas id="countryChart" width="600" height="300"></canvas>
-                <div class="text-end mt-2">
-                    <button id="downloadCountryBtn" class="btn btn-sm btn-outline-secondary"
-                        title="Download chart">Download Chart</button>
+                <div class="chart-card">
+                    <h5 class="chart-card-title" id="countryChartTitle">Total Tickets by Country</h5>
+                    <div class="chart-canvas-wrap">
+                        <canvas id="countryChart"></canvas>
+                    </div>
+                    <div class="chart-card-foot">
+                        <button id="downloadCountryBtn" class="btn btn-sm btn-outline-secondary"
+                            title="Download chart">Download Chart</button>
+                    </div>
                 </div>
             </div>
             <div class="col-md-6 mt-4">
-                <h5 class="text-center mb-3" id="categoryChartTitle">Ticket Count by WIGOS Ticket Category</h5>
-                <canvas id="categoryChart" width="600" height="300"></canvas>
-                <div class="text-end mt-2">
-                    <button id="downloadCategoryBtn" class="btn btn-sm btn-outline-secondary"
-                        title="Download chart">Download Chart</button>
+                <div class="chart-card">
+                    <h5 class="chart-card-title" id="categoryChartTitle">Ticket Count by WIGOS Ticket Category</h5>
+                    <div class="chart-canvas-wrap">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                    <div class="chart-card-foot">
+                        <button id="downloadCategoryBtn" class="btn btn-sm btn-outline-secondary"
+                            title="Download chart">Download Chart</button>
+                    </div>
                 </div>
             </div>
 
@@ -978,6 +1026,31 @@
                 return '#bdc3c7'; // Abu-abu netral jika tidak ditemukan
             }
             // Plugin ringan untuk menampilkan nilai di atas batang / di tengah pie
+            // Shared chart look: vertical gradient bars, soft grid, roomy tooltips.
+            function verticalGradient(ctx, baseColor) {
+                const g = ctx.createLinearGradient(0, 0, 0, 320);
+                g.addColorStop(0, baseColor);
+                g.addColorStop(1, baseColor + '99');
+                return g;
+            }
+
+            const CHART_TOOLTIP = {
+                backgroundColor: 'rgba(19, 49, 95, 0.92)',
+                titleColor: '#ffffff',
+                bodyColor: '#e8eefb',
+                titleFont: { size: 12, weight: '600' },
+                bodyFont: { size: 12 },
+                padding: 10,
+                cornerRadius: 8,
+                displayColors: true,
+                boxPadding: 4,
+            };
+
+            const CHART_SCALE_STYLE = {
+                grid: { color: 'rgba(19, 49, 95, 0.07)', drawBorder: false },
+                border: { display: false },
+            };
+
             const valueLabelPlugin = {
                 id: 'valueLabelPlugin',
                 afterDatasetsDraw(chart) {
@@ -1071,42 +1144,76 @@
                             data: allCountries.map(country =>
                                 countryCategoryCounts[country][category] || 0
                             ),
-                            backgroundColor: getColorForCategory(category)
+                            backgroundColor: verticalGradient(ctxCategory, getColorForCategory(category)),
+                            hoverBackgroundColor: getColorForCategory(category),
+                            borderRadius: 6,
+                            borderSkipped: false,
+                            maxBarThickness: 26,
                         };
+                    });
+
+                    // Totals per category make the legend meaningful: "which
+                    // kind of problem dominates?" is the usual question.
+                    const categoryTotals = {};
+                    datasets.forEach(d => {
+                        categoryTotals[d.label] = d.data.reduce((a, b) => a + b, 0);
                     });
 
                     categoryChart = new Chart(ctxCategory, {
                         plugins: [valueLabelPlugin],
                         type: 'bar',
-                        data: {
-                            labels: allCountries, // Countries di X-axis
-                            datasets: datasets     // 4 bars per country (satu untuk setiap category)
-                        },
+                        data: { labels: allCountries, datasets },
                         options: {
                             responsive: true,
+                            maintainAspectRatio: false,
+                            animation: { duration: 600, easing: 'easeOutQuart' },
+                            interaction: { mode: 'index', intersect: false },
                             plugins: {
                                 legend: {
-                                    position: 'top',
-                                    display: true
+                                    position: 'bottom',
+                                    display: true,
+                                    labels: {
+                                        usePointStyle: true,
+                                        pointStyle: 'circle',
+                                        boxWidth: 8,
+                                        padding: 14,
+                                        color: '#334e73',
+                                        font: { size: 11, weight: '600' },
+                                        generateLabels(chart) {
+                                            const items = Chart.defaults.plugins.legend.labels.generateLabels(chart);
+                                            items.forEach(item => {
+                                                const total = categoryTotals[item.text];
+                                                if (total !== undefined) item.text = `${item.text} (${total})`;
+                                            });
+                                            return items;
+                                        }
+                                    }
                                 },
                                 tooltip: {
-                                    mode: 'index',
-                                    intersect: false,
+                                    ...CHART_TOOLTIP,
                                     callbacks: {
-                                        label: context => `${context.dataset.label}: ${context.parsed.y} issue(s)`
+                                        label: context => ` ${context.dataset.label}: ${context.parsed.y} ticket(s)`
                                     }
                                 }
                             },
-                            layout: { padding: { top: 24 } },
+                            layout: { padding: { top: 28, right: 8, left: 0 } },
                             scales: {
                                 x: {
-                                    grid: {
-                                        display: false
+                                    stacked: false,
+                                    grid: { display: false },
+                                    border: { display: false },
+                                    ticks: {
+                                        color: '#334e73',
+                                        font: { size: 11, weight: '600' },
+                                        maxRotation: 45,
+                                        minRotation: 0,
+                                        autoSkip: false,
                                     }
                                 },
                                 y: {
                                     beginAtZero: true,
-                                    ticks: { stepSize: 1 }
+                                    ticks: { stepSize: 1, color: '#5f738d', font: { size: 11 } },
+                                    ...CHART_SCALE_STYLE,
                                 }
                             }
                         }
@@ -1126,42 +1233,64 @@
             function renderCountryChart(data) {
                 if (!ctxCountry) return;
                 if (countryChart) countryChart.destroy();
-                const labels = Object.keys(data);
-                const values = Object.values(data);
-                const backgroundColors = labels.map(() => '#783F00');
+
+                // Sort descending so the ranking reads at a glance.
+                const entries = Object.entries(data).sort((a, b) => b[1] - a[1]);
+                const labels = entries.map(e => e[0]);
+                const values = entries.map(e => e[1]);
+                const total = values.reduce((a, b) => a + b, 0);
+
                 countryChart = new Chart(ctxCountry, {
                     plugins: [valueLabelPlugin],
                     type: 'bar',
                     data: {
-                        labels: labels,
+                        labels,
                         datasets: [{
                             label: 'Number of Tickets',
                             data: values,
-                            backgroundColor: backgroundColors,
-                            borderColor: '#783F00',
-                            borderWidth: 1,
-                            borderRadius: 5
+                            backgroundColor: verticalGradient(ctxCountry, '#2f6fe4'),
+                            hoverBackgroundColor: '#1e5fd6',
+                            borderColor: '#2f6fe4',
+                            borderWidth: 0,
+                            borderRadius: 8,
+                            borderSkipped: false,
+                            maxBarThickness: 48,
                         }]
                     },
                     options: {
                         responsive: true,
+                        maintainAspectRatio: false,
+                        animation: { duration: 600, easing: 'easeOutQuart' },
+                        interaction: { mode: 'index', intersect: false },
                         plugins: {
                             legend: { display: false },
                             tooltip: {
+                                ...CHART_TOOLTIP,
                                 callbacks: {
-                                    label: context => `${context.label}: ${context.parsed.y} issue(s)`
+                                    label: context => ` ${context.parsed.y} ticket(s)`,
+                                    afterLabel: context => {
+                                        const pct = total ? (context.parsed.y / total * 100) : 0;
+                                        return ` ${pct.toFixed(1)}% of ${total}`;
+                                    }
                                 }
                             }
                         },
-                        layout: { padding: { top: 24 } },
+                        layout: { padding: { top: 28, right: 8, left: 0 } },
                         scales: {
                             y: {
                                 beginAtZero: true,
-                                ticks: { stepSize: 1 }
+                                ticks: { stepSize: 1, color: '#5f738d', font: { size: 11 } },
+                                ...CHART_SCALE_STYLE,
                             },
                             x: {
-                                grid: {
-                                    display: false
+                                grid: { display: false },
+                                border: { display: false },
+                                ticks: {
+                                    color: '#334e73',
+                                    font: { size: 11, weight: '600' },
+                                    maxRotation: 45,
+                                    minRotation: 0,
+                                    autoSkip: false,
                                 }
                             }
                         }
