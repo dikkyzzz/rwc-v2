@@ -315,7 +315,7 @@
                 </a>
             </div>
             <div class="sidebar-nav-item mt-4">
-                <a href="index.html" class="sidebar-link">
+                <a href="issues" class="sidebar-link">
                     <i class="bi bi-arrow-left-circle"></i>
                     <span>Public Dashboard</span>
                 </a>
@@ -641,7 +641,7 @@
 
                 if (!response.ok) {
                     clearLocalAuth();
-                    window.location.href = 'admin-login.html';
+                    window.location.href = 'admin-login';
                     return;
                 }
 
@@ -660,7 +660,7 @@
             } catch (error) {
                 console.error('Auth check failed:', error);
                 clearLocalAuth();
-                window.location.href = 'admin-login.html';
+                window.location.href = 'admin-login';
             }
         }
 
@@ -693,7 +693,7 @@
                 localStorage.removeItem('adminToken');
                 localStorage.removeItem('adminUser');
                 localStorage.removeItem('adminSession');
-                window.location.href = 'admin-login.html';
+                window.location.href = 'admin-login';
             }
         }
 
@@ -752,7 +752,7 @@
                 });
                 if (!response.ok) {
                     if (response.status === 401) {
-                        window.location.href = 'admin-login.html';
+                        window.location.href = 'admin-login';
                         return;
                     }
                     throw new Error(`HTTP error! status: ${response.status}`);

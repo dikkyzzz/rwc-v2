@@ -40,6 +40,7 @@ const {
 } = require('./lib/monitoring-users');
 const pagesRouter = require('./routes/pages');
 const wdqmsRouter = require('./routes/wdqms');
+const { router: monitoringRouter } = require('./routes/monitoring');
 const AdmZip = require('adm-zip');
 const puppeteer = require('puppeteer');
 
@@ -92,7 +93,9 @@ app.use('/logo-full.svg', express.static(path.join(__dirname, '../logo-update.sv
 app.use('/logo-icon.svg', express.static(path.join(__dirname, '../logo-icon.svg')));
 app.use('/logo-bmkg.png', express.static(path.join(__dirname, '../logo-bmkg.webp')));
 app.use('/', express.static(path.join(__dirname, '../../landingpage')));
-app.use('/monitoring', monitoringPageAuth, express.static(path.join(__dirname, '../public')));
+app.use('/monitoring', monitoringPageAuth, monitoringRouter);
+// Static assets (js, images) still come straight from public/.
+app.use('/monitoring', express.static(path.join(__dirname, '../public')));
 app.use('/', pagesRouter);
 app.use('/', wdqmsRouter);
 // Aplikasi WDQMS v1 (PHP) sudah dipindahkan ke WDQMS v2. Arahkan semua

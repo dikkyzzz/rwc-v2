@@ -161,29 +161,40 @@ function authenticateMonitoring(req, res, next) {
     next();
 }
 
-function monitoringPageAuth(req, res, next) {
-    const pathName = req.path || '/';
-    const allowedWithoutMonitoringLogin = new Set([
-        '/monitoring-login.html',
-        '/admin-login.html',
-        '/admin.html'
-    ]);
+// Pages that require a monitoring session, by clean URL slug. The legacy
+// .html names are listed too so the redirects they trigger stay reachable.
+const PROTECTED_SLUGS = new Set([
+    'issues', 'stats', 'reports', 'about', 'contact',
+    'index.html', 'stats.html', 'report.html', 'about.html', 'contact.html',
+]);
+const PUBLIC_SLUGS = new Set([
+    'login', 'admin-login', 'admin',
+    'monitoring-login.html', 'admin-login.html', 'admin.html',
+]);
 
-    if (allowedWithoutMonitoringLogin.has(pathName)) {
-        if (pathName === '/monitoring-login.html' && getMonitoringSessionFromRequest(req)) {
-            return res.redirect('/monitoring/index.html');
+function monitoringPageAuth(req, res, next) {
+    // Mounted at /monitoring, so req.path is '/issues' (no prefix).
+    // Strip the leading slash so it can match the slug sets below.
+    const rawPath = req.path || '/';
+    const pathName = rawPath === '/' ? '/' : rawPath.replace(/^\//, '');
+
+    if (PUBLIC_SLUGS.has(pathName)) {
+        // Already signed in? Skip the login form.
+        if (pathName === 'login' && getMonitoringSessionFromRequest(req)) {
+            return res.redirect('/monitoring/issues');
         }
         return next();
     }
 
-    const protectedPages = new Set(['/', '/index.html', '/stats.html', '/report.html', '/about.html', '/contact.html']);
-    if (!protectedPages.has(pathName)) {
+    // Anything else under /monitoring is a static asset (js, png, ...) or a
+    // protected page. Only gate the pages we know about.
+    if (!PROTECTED_SLUGS.has(pathName) && pathName !== '/') {
         return next();
     }
 
     const sessionInfo = getMonitoringSessionFromRequest(req);
     if (!sessionInfo) {
-        return res.redirect('/monitoring/monitoring-login.html');
+        return res.redirect('/monitoring/login');
     }
 
     req.monitoringUser = sessionInfo.session.user;
@@ -235,6 +246,8 @@ function requireSuperAdmin(req, res, next) {
 
 module.exports = {
     sessions,
+    PROTECTED_SLUGS,
+    PUBLIC_SLUGS,
     ADMIN_SESSION_COOKIE,
     setAdminSessionCookie,
     clearAdminSessionCookie,

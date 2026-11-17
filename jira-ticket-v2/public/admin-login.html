@@ -238,7 +238,7 @@
         </form>
 
         <div class="back-link">
-            <a href="index.html">
+            <a href="issues">
                 <i class="bi bi-arrow-left"></i>
                 Back to Home
             </a>
@@ -299,7 +299,7 @@
                     // needs to be written to localStorage any more.
                     showAlert('Login successful! Redirecting...', 'success');
                     setTimeout(() => {
-                        window.location.href = 'admin.html';
+                        window.location.href = 'admin';
                     }, 1000);
                 } else {
                     showAlert(data.message || 'Login failed', 'danger');
@@ -330,7 +330,7 @@
             fetch('/api/admin/session')
                 .then(response => {
                     if (response.ok) {
-                        window.location.href = 'admin.html';
+                        window.location.href = 'admin';
                     }
                 })
                 .catch(() => {});

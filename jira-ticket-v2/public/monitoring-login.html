@@ -298,7 +298,7 @@
                 if (response.ok) {
                     showAlert('Login successful! Redirecting...', 'success');
                     setTimeout(() => {
-                        window.location.href = 'index.html';
+                        window.location.href = 'issues';
                     }, 1000);
                 } else {
                     showAlert(data.message || 'Login failed', 'danger');
@@ -328,7 +328,7 @@
             fetch('/api/monitoring/session')
                 .then(response => {
                     if (response.ok) {
-                        window.location.href = 'index.html';
+                        window.location.href = 'issues';
                     }
                 })
                 .catch(() => {});
