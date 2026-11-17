@@ -177,6 +177,132 @@
             text-decoration: none;
         }
 
+        /* Summary table: readable at a glance — sticky header, zebra rows,
+           a strong totals row and tabular figures so columns line up. */
+        .summary-wrap {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            box-shadow: 0 6px 20px rgba(19, 49, 95, 0.06);
+            overflow: hidden;
+        }
+
+        #summaryTable {
+            margin: 0;
+            border: 0;
+            font-size: 0.88rem;
+            --bs-table-bg: transparent;
+        }
+
+        #summaryTable thead th {
+            background: linear-gradient(180deg, #f4f8fe 0%, #e9f1fc 100%);
+            color: var(--primary-dark);
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            border-bottom: 1px solid #cfe1fb;
+            border-top: 0;
+            padding: 12px 14px;
+            white-space: nowrap;
+        }
+
+        #summaryTable tbody td {
+            padding: 10px 14px;
+            color: #334e73;
+            border-color: rgba(19, 49, 95, 0.06);
+            vertical-align: middle;
+        }
+
+        #summaryTable tbody tr:nth-child(even) {
+            background: #fafcff;
+        }
+
+        #summaryTable tbody tr:hover {
+            background: #f1f7ff;
+        }
+
+        /* Country column reads as a label; numbers are tabular so digits align. */
+        #summaryTable tbody td:first-child {
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        #summaryTable td:not(:first-child),
+        #summaryTable th:not(:first-child) {
+            font-variant-numeric: tabular-nums;
+        }
+
+        #summaryTable tfoot td {
+            background: linear-gradient(180deg, #eef5ff 0%, #e4eefc 100%);
+            color: var(--primary-dark);
+            font-weight: 700;
+            font-size: 0.9rem;
+            border-top: 2px solid #cfe1fb;
+            border-bottom: 0;
+            padding: 12px 14px;
+        }
+
+        @media (max-width: 768px) {
+            #summaryTable { font-size: 0.8rem; }
+            #summaryTable thead th,
+            #summaryTable tbody td,
+            #summaryTable tfoot td { padding: 9px 10px; }
+        }
+
+        /* Filter panel: soft blue wash so it reads as a control surface
+           rather than another content card. */
+        .filter-card {
+            background: linear-gradient(160deg, #f2f7ff 0%, #e8f1ff 100%);
+            border: 1px solid #cfe1fb;
+            border-radius: 14px;
+            box-shadow: 0 6px 20px rgba(19, 49, 95, 0.06);
+            padding: 20px 22px 16px;
+        }
+
+        .filter-card-head {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            padding-bottom: 12px;
+            margin-bottom: 14px;
+            border-bottom: 1px solid #cfe1fb;
+        }
+
+        .filter-card-head i {
+            color: var(--accent);
+            font-size: 0.9rem;
+        }
+
+        .filter-card .form-label {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #334e73;
+            margin-bottom: 4px;
+        }
+
+        .filter-card .form-control,
+        .filter-card .form-select {
+            border-color: #cfe1fb;
+            background-color: #ffffff;
+            font-size: 0.87rem;
+        }
+
+        .filter-card .form-control:focus,
+        .filter-card .form-select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(47, 111, 228, 0.15);
+        }
+
+        .filter-card .form-text {
+            font-size: 0.72rem;
+            color: #6b86a8;
+        }
+
         /* Chart cards: a fixed-height canvas area so Chart.js sizes itself
            consistently instead of collapsing to its attribute height. */
         .chart-card {
@@ -470,8 +596,11 @@
             <!-- Filter Monthly Sederhana -->
             <div class="row justify-content-center mb-4">
                 <div class="col-md-8 col-lg-6">
-                    <div class="card p-3 bg-light">
-                        <h6 class="text-center mb-3">Filter by Month & Year</h6>
+                    <div class="filter-card">
+                        <div class="filter-card-head">
+                            <i class="fas fa-filter" aria-hidden="true"></i>
+                            <span>Filter by Month &amp; Year</span>
+                        </div>
                         <div class="row g-2">
                             <!-- Input untuk Month -->
                             <div class="col-md-6">
@@ -563,9 +692,10 @@
             <!-- Numeric summary: charts alone cannot be read to an exact value -->
             <div class="col-md-12 mt-5">
                 <h5 class="text-center mb-3" id="summaryTableTitle">Summary Numbers</h5>
-                <div class="table-responsive">
-                    <table class="table table-sm table-bordered align-middle mb-0" id="summaryTable">
-                        <thead class="table-light">
+                <div class="summary-wrap">
+                    <div class="table-responsive">
+                    <table class="table align-middle mb-0" id="summaryTable">
+                        <thead>
                             <tr>
                                 <th scope="col">Country</th>
                                 <th scope="col" class="text-end">Total</th>
@@ -580,6 +710,7 @@
                         </tbody>
                         <tfoot id="summaryTableFoot"></tfoot>
                     </table>
+                    </div>
                 </div>
                 <div class="text-end mt-2">
                     <button id="downloadSummaryCsvBtn" class="btn btn-sm btn-outline-secondary"
@@ -1432,7 +1563,7 @@
                 }), { total: 0, closed: 0, open: 0, inprogress: 0, other: 0 });
 
                 foot.innerHTML = `
-                    <tr class="fw-semibold table-light">
+                    <tr class="fw-semibold">
                         <td>Total</td>
                         <td class="text-end">${totals.total}</td>
                         <td class="text-end">${totals.closed}</td>
