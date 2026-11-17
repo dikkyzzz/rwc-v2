@@ -1722,26 +1722,24 @@ app.post('/api/admin/monthly-report', authenticateAdmin, async (req, res) => {
                     }
                 };
 
-                // === Chart 1a: Issue Count by Status (Vertical) ===
-                {
-                    const labels = Object.keys(statusCounts).map(s => s.charAt(0).toUpperCase() + s.slice(1));
-                    const values = Object.values(statusCounts);
-                    const backgroundColors = labels.map(label => getColorForStatus(label));
-
-                    const chartHtml = `
+                // Build the chart page. All nine report charts share the same
+                // shell: identical <head>, <h2>, canvas and the chartReady
+                // polling loop, differing only in title, size and the Chart.js
+                // config. Centralising it keeps the nine blocks readable.
+                const buildChartHtml = ({ title, width = 800, height = 450, chartConfig }) => `
 <!DOCTYPE html>
 <html><head><meta charset="UTF-8">
 
-<style>body{margin:0;padding:20px;background:white;font-family:'Segoe UI',sans-serif}#chartContainer{width:800px;height:450px;margin:0 auto}h2{text-align:center;color:#333;margin-bottom:20px;font-size:24px}</style>
+<style>body{margin:0;padding:20px;background:white;font-family:'Segoe UI',sans-serif}#chartContainer{width:${width}px;height:${height}px;margin:0 auto}h2{text-align:center;color:#333;margin-bottom:20px;font-size:24px}</style>
 </head><body>
-<h2>Issue Count by Status (Vertical) - ${bulanEnglish} ${tahun}</h2>
+<h2>${title}</h2>
 <div id="chartContainer"><canvas id="myChart"></canvas></div>
 <script>
 window.chartReady = false;
 function waitForChart() {
     if (typeof Chart !== 'undefined') {
         const ctx = document.getElementById('myChart').getContext('2d');
-        new Chart(ctx,{type:'bar',data:{labels:${JSON.stringify(labels)},datasets:[{label:'Issues',data:${JSON.stringify(values)},backgroundColor:${JSON.stringify(backgroundColors)},borderRadius:5}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1}},x:{grid:{display:false}}}}});
+        new Chart(ctx, ${chartConfig});
         window.chartReady = true;
     } else {
         setTimeout(waitForChart, 100);
@@ -1749,6 +1747,18 @@ function waitForChart() {
 }
 waitForChart();
 </script></body></html>`;
+
+                // === Chart 1a: Issue Count by Status (Vertical) ===
+                {
+                    const labels = Object.keys(statusCounts).map(s => s.charAt(0).toUpperCase() + s.slice(1));
+                    const values = Object.values(statusCounts);
+                    const backgroundColors = labels.map(label => getColorForStatus(label));
+
+                    const chartHtml = buildChartHtml({
+                        title: `Issue Count by Status (Vertical) - ${bulanEnglish} ${tahun}`,
+                        width: 800, height: 450,
+                        chartConfig: `{type:'bar',data:{labels:${JSON.stringify(labels)},datasets:[{label:'Issues',data:${JSON.stringify(values)},backgroundColor:${JSON.stringify(backgroundColors)},borderRadius:5}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1}},x:{grid:{display:false}}}}}`,
+                    });
 
                     const buffer = await captureChartPng(chartHtml, { width: 840, height: 550 });
                     const fileName = `Laporan_Chart_Status_Vertical_${bulan}_${tahun}.png`;
@@ -1772,27 +1782,11 @@ waitForChart();
                     const values = Object.values(statusCounts);
                     const backgroundColors = labels.map(label => getColorForStatus(label));
 
-                    const chartHtml = `
-<!DOCTYPE html>
-<html><head><meta charset="UTF-8">
-
-<style>body{margin:0;padding:20px;background:white;font-family:'Segoe UI',sans-serif}#chartContainer{width:800px;height:450px;margin:0 auto}h2{text-align:center;color:#333;margin-bottom:20px;font-size:24px}</style>
-</head><body>
-<h2>Issue Count by Status (Horizontal) - ${bulanEnglish} ${tahun}</h2>
-<div id="chartContainer"><canvas id="myChart"></canvas></div>
-<script>
-window.chartReady = false;
-function waitForChart() {
-    if (typeof Chart !== 'undefined') {
-        const ctx = document.getElementById('myChart').getContext('2d');
-        new Chart(ctx,{type:'bar',data:{labels:${JSON.stringify(labels)},datasets:[{label:'Issues',data:${JSON.stringify(values)},backgroundColor:${JSON.stringify(backgroundColors)},borderRadius:5}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,ticks:{stepSize:1}},y:{grid:{display:false}}}}});
-        window.chartReady = true;
-    } else {
-        setTimeout(waitForChart, 100);
-    }
-}
-waitForChart();
-</script></body></html>`;
+                    const chartHtml = buildChartHtml({
+                        title: `Issue Count by Status (Horizontal) - ${bulanEnglish} ${tahun}`,
+                        width: 800, height: 450,
+                        chartConfig: `{type:'bar',data:{labels:${JSON.stringify(labels)},datasets:[{label:'Issues',data:${JSON.stringify(values)},backgroundColor:${JSON.stringify(backgroundColors)},borderRadius:5}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,ticks:{stepSize:1}},y:{grid:{display:false}}}}}`,
+                    });
 
                     const buffer = await captureChartPng(chartHtml, { width: 840, height: 550 });
                     const fileName = `Laporan_Chart_Status_Horizontal_${bulan}_${tahun}.png`;
@@ -1808,27 +1802,11 @@ waitForChart();
                     const values = Object.values(statusCounts);
                     const backgroundColors = labels.map(label => getColorForStatus(label));
 
-                    const chartHtml = `
-<!DOCTYPE html>
-<html><head><meta charset="UTF-8">
-
-<style>body{margin:0;padding:20px;background:white;font-family:'Segoe UI',sans-serif}#chartContainer{width:600px;height:500px;margin:0 auto}h2{text-align:center;color:#333;margin-bottom:20px;font-size:24px}</style>
-</head><body>
-<h2>Issue Count by Status (Pie) - ${bulanEnglish} ${tahun}</h2>
-<div id="chartContainer"><canvas id="myChart"></canvas></div>
-<script>
-window.chartReady = false;
-function waitForChart() {
-    if (typeof Chart !== 'undefined') {
-        const ctx = document.getElementById('myChart').getContext('2d');
-        new Chart(ctx,{type:'pie',data:{labels:${JSON.stringify(labels)},datasets:[{data:${JSON.stringify(values)},backgroundColor:${JSON.stringify(backgroundColors)}}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{position:'right'}}}});
-        window.chartReady = true;
-    } else {
-        setTimeout(waitForChart, 100);
-    }
-}
-waitForChart();
-</script></body></html>`;
+                    const chartHtml = buildChartHtml({
+                        title: `Issue Count by Status (Pie) - ${bulanEnglish} ${tahun}`,
+                        width: 600, height: 500,
+                        chartConfig: `{type:'pie',data:{labels:${JSON.stringify(labels)},datasets:[{data:${JSON.stringify(values)},backgroundColor:${JSON.stringify(backgroundColors)}}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{position:'right'}}}}`,
+                    });
 
                     const buffer = await captureChartPng(chartHtml, { width: 840, height: 550 }, { type: 'png', fullPage: true });
                     const fileName = `Laporan_Chart_Status_Pie_${bulan}_${tahun}.png`;
@@ -1850,27 +1828,11 @@ waitForChart();
                     const values = Object.values(allStatusCounts);
                     const backgroundColors = labels.map(label => getColorForStatus(label));
 
-                    const chartHtml = `
-<!DOCTYPE html>
-<html><head><meta charset="UTF-8">
-
-<style>body{margin:0;padding:20px;background:white;font-family:'Segoe UI',sans-serif}#chartContainer{width:800px;height:450px;margin:0 auto}h2{text-align:center;color:#333;margin-bottom:20px;font-size:24px}</style>
-</head><body>
-<h2>Issue Count by Status - All Data (Vertical)</h2>
-<div id="chartContainer"><canvas id="myChart"></canvas></div>
-<script>
-window.chartReady = false;
-function waitForChart() {
-    if (typeof Chart !== 'undefined') {
-        const ctx = document.getElementById('myChart').getContext('2d');
-        new Chart(ctx,{type:'bar',data:{labels:${JSON.stringify(labels)},datasets:[{label:'Issues',data:${JSON.stringify(values)},backgroundColor:${JSON.stringify(backgroundColors)},borderRadius:5}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1}},x:{grid:{display:false}}}}});
-        window.chartReady = true;
-    } else {
-        setTimeout(waitForChart, 100);
-    }
-}
-waitForChart();
-</script></body></html>`;
+                    const chartHtml = buildChartHtml({
+                        title: `Issue Count by Status - All Data (Vertical)`,
+                        width: 800, height: 450,
+                        chartConfig: `{type:'bar',data:{labels:${JSON.stringify(labels)},datasets:[{label:'Issues',data:${JSON.stringify(values)},backgroundColor:${JSON.stringify(backgroundColors)},borderRadius:5}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1}},x:{grid:{display:false}}}}}`,
+                    });
 
                     const buffer = await captureChartPng(chartHtml, { width: 840, height: 550 });
                     const fileName = `Laporan_Chart_StatusAll_Vertical_${bulan}_${tahun}.png`;
@@ -1893,27 +1855,11 @@ waitForChart();
                     const values = Object.values(allStatusCounts);
                     const backgroundColors = labels.map(label => getColorForStatus(label));
 
-                    const chartHtml = `
-<!DOCTYPE html>
-<html><head><meta charset="UTF-8">
-
-<style>body{margin:0;padding:20px;background:white;font-family:'Segoe UI',sans-serif}#chartContainer{width:800px;height:450px;margin:0 auto}h2{text-align:center;color:#333;margin-bottom:20px;font-size:24px}</style>
-</head><body>
-<h2>Issue Count by Status - All Data (Horizontal)</h2>
-<div id="chartContainer"><canvas id="myChart"></canvas></div>
-<script>
-window.chartReady = false;
-function waitForChart() {
-    if (typeof Chart !== 'undefined') {
-        const ctx = document.getElementById('myChart').getContext('2d');
-        new Chart(ctx,{type:'bar',data:{labels:${JSON.stringify(labels)},datasets:[{label:'Issues',data:${JSON.stringify(values)},backgroundColor:${JSON.stringify(backgroundColors)},borderRadius:5}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,ticks:{stepSize:1}},y:{grid:{display:false}}}}});
-        window.chartReady = true;
-    } else {
-        setTimeout(waitForChart, 100);
-    }
-}
-waitForChart();
-</script></body></html>`;
+                    const chartHtml = buildChartHtml({
+                        title: `Issue Count by Status - All Data (Horizontal)`,
+                        width: 800, height: 450,
+                        chartConfig: `{type:'bar',data:{labels:${JSON.stringify(labels)},datasets:[{label:'Issues',data:${JSON.stringify(values)},backgroundColor:${JSON.stringify(backgroundColors)},borderRadius:5}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,ticks:{stepSize:1}},y:{grid:{display:false}}}}}`,
+                    });
 
                     const buffer = await captureChartPng(chartHtml, { width: 840, height: 550 });
                     const fileName = `Laporan_Chart_StatusAll_Horizontal_${bulan}_${tahun}.png`;
@@ -1936,27 +1882,11 @@ waitForChart();
                     const values = Object.values(allStatusCounts);
                     const backgroundColors = labels.map(label => getColorForStatus(label));
 
-                    const chartHtml = `
-<!DOCTYPE html>
-<html><head><meta charset="UTF-8">
-
-<style>body{margin:0;padding:20px;background:white;font-family:'Segoe UI',sans-serif}#chartContainer{width:600px;height:500px;margin:0 auto}h2{text-align:center;color:#333;margin-bottom:20px;font-size:24px}</style>
-</head><body>
-<h2>Issue Count by Status - All Data (Pie)</h2>
-<div id="chartContainer"><canvas id="myChart"></canvas></div>
-<script>
-window.chartReady = false;
-function waitForChart() {
-    if (typeof Chart !== 'undefined') {
-        const ctx = document.getElementById('myChart').getContext('2d');
-        new Chart(ctx,{type:'pie',data:{labels:${JSON.stringify(labels)},datasets:[{data:${JSON.stringify(values)},backgroundColor:${JSON.stringify(backgroundColors)}}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{position:'right'}}}});
-        window.chartReady = true;
-    } else {
-        setTimeout(waitForChart, 100);
-    }
-}
-waitForChart();
-</script></body></html>`;
+                    const chartHtml = buildChartHtml({
+                        title: `Issue Count by Status - All Data (Pie)`,
+                        width: 600, height: 500,
+                        chartConfig: `{type:'pie',data:{labels:${JSON.stringify(labels)},datasets:[{data:${JSON.stringify(values)},backgroundColor:${JSON.stringify(backgroundColors)}}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{position:'right'}}}}`,
+                    });
 
                     const buffer = await captureChartPng(chartHtml, { width: 840, height: 550 }, { type: 'png', fullPage: true });
                     const fileName = `Laporan_Chart_StatusAll_Pie_${bulan}_${tahun}.png`;
@@ -1974,27 +1904,11 @@ waitForChart();
                     const values = Object.values(countryCounts);
                     const backgroundColors = labels.map(label => getColorForCountry(label));
 
-                    const chartHtml = `
-<!DOCTYPE html>
-<html><head><meta charset="UTF-8">
-
-<style>body{margin:0;padding:20px;background:white;font-family:'Segoe UI',sans-serif}#chartContainer{width:800px;height:450px;margin:0 auto}h2{text-align:center;color:#333;margin-bottom:20px;font-size:24px}</style>
-</head><body>
-<h2>Total Issues by Country - ${bulanEnglish} ${tahun}</h2>
-<div id="chartContainer"><canvas id="myChart"></canvas></div>
-<script>
-window.chartReady = false;
-function waitForChart() {
-    if (typeof Chart !== 'undefined') {
-        const ctx = document.getElementById('myChart').getContext('2d');
-        new Chart(ctx,{type:'bar',data:{labels:${JSON.stringify(labels)},datasets:[{label:'Issues',data:${JSON.stringify(values)},backgroundColor:${JSON.stringify(backgroundColors)},borderRadius:5}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1}},x:{grid:{display:false}}}}});
-        window.chartReady = true;
-    } else {
-        setTimeout(waitForChart, 100);
-    }
-}
-waitForChart();
-</script></body></html>`;
+                    const chartHtml = buildChartHtml({
+                        title: `Total Issues by Country - ${bulanEnglish} ${tahun}`,
+                        width: 800, height: 450,
+                        chartConfig: `{type:'bar',data:{labels:${JSON.stringify(labels)},datasets:[{label:'Issues',data:${JSON.stringify(values)},backgroundColor:${JSON.stringify(backgroundColors)},borderRadius:5}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1}},x:{grid:{display:false}}}}}`,
+                    });
 
                     const buffer = await captureChartPng(chartHtml, { width: 840, height: 550 });
                     const fileName = `Laporan_Chart_Country_${bulan}_${tahun}.png`;
@@ -2014,27 +1928,11 @@ waitForChart();
                         backgroundColor: getColorForStatus(status)
                     }));
 
-                    const chartHtml = `
-<!DOCTYPE html>
-<html><head><meta charset="UTF-8">
-
-<style>body{margin:0;padding:20px;background:white;font-family:'Segoe UI',sans-serif}#chartContainer{width:900px;height:500px;margin:0 auto}h2{text-align:center;color:#333;margin-bottom:20px;font-size:24px}</style>
-</head><body>
-<h2>Issues by Country and Status (Stacked) - ${bulanEnglish} ${tahun}</h2>
-<div id="chartContainer"><canvas id="myChart"></canvas></div>
-<script>
-window.chartReady = false;
-function waitForChart() {
-    if (typeof Chart !== 'undefined') {
-        const ctx = document.getElementById('myChart').getContext('2d');
-        new Chart(ctx,{type:'bar',data:{labels:${JSON.stringify(countries)},datasets:${JSON.stringify(datasets)}},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{position:'top'}},scales:{x:{stacked:true},y:{stacked:true,beginAtZero:true,ticks:{stepSize:1}}}}});
-        window.chartReady = true;
-    } else {
-        setTimeout(waitForChart, 100);
-    }
-}
-waitForChart();
-</script></body></html>`;
+                    const chartHtml = buildChartHtml({
+                        title: `Issues by Country and Status (Stacked) - ${bulanEnglish} ${tahun}`,
+                        width: 900, height: 500,
+                        chartConfig: `{type:'bar',data:{labels:${JSON.stringify(countries)},datasets:${JSON.stringify(datasets)}},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{position:'top'}},scales:{x:{stacked:true},y:{stacked:true,beginAtZero:true,ticks:{stepSize:1}}}}}`,
+                    });
 
                     const buffer = await captureChartPng(chartHtml, { width: 940, height: 600 });
                     const fileName = `Laporan_Chart_CountryStatus_${bulan}_${tahun}.png`;
@@ -2054,27 +1952,11 @@ waitForChart();
                         backgroundColor: getColorForCategory(cat)
                     }));
 
-                    const chartHtml = `
-<!DOCTYPE html>
-<html><head><meta charset="UTF-8">
-
-<style>body{margin:0;padding:20px;background:white;font-family:'Segoe UI',sans-serif}#chartContainer{width:900px;height:500px;margin:0 auto}h2{text-align:center;color:#333;margin-bottom:20px;font-size:24px}</style>
-</head><body>
-<h2>Issues by WIGOS Issue Category - ${bulanEnglish} ${tahun}</h2>
-<div id="chartContainer"><canvas id="myChart"></canvas></div>
-<script>
-window.chartReady = false;
-function waitForChart() {
-    if (typeof Chart !== 'undefined') {
-        const ctx = document.getElementById('myChart').getContext('2d');
-        new Chart(ctx,{type:'bar',data:{labels:${JSON.stringify(countries)},datasets:${JSON.stringify(datasets)}},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{position:'top'}},scales:{y:{beginAtZero:true,ticks:{stepSize:1}},x:{grid:{display:false}}}}});
-        window.chartReady = true;
-    } else {
-        setTimeout(waitForChart, 100);
-    }
-}
-waitForChart();
-</script></body></html>`;
+                    const chartHtml = buildChartHtml({
+                        title: `Issues by WIGOS Issue Category - ${bulanEnglish} ${tahun}`,
+                        width: 900, height: 500,
+                        chartConfig: `{type:'bar',data:{labels:${JSON.stringify(countries)},datasets:${JSON.stringify(datasets)}},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{position:'top'}},scales:{y:{beginAtZero:true,ticks:{stepSize:1}},x:{grid:{display:false}}}}}`,
+                    });
 
                     const buffer = await captureChartPng(chartHtml, { width: 940, height: 600 });
                     const fileName = `Laporan_Chart_Category_${bulan}_${tahun}.png`;
