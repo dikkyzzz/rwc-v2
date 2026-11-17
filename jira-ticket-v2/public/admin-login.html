@@ -295,9 +295,8 @@
                 }
                 
                 if (response.ok) {
-                    localStorage.setItem('adminToken', data.token);
-                    localStorage.setItem('adminUser', data.user.displayName || data.user.email);
-                    localStorage.setItem('adminSession', JSON.stringify(data.user));
+                    // The server sets an httpOnly admin_session cookie; nothing
+                    // needs to be written to localStorage any more.
                     showAlert('Login successful! Redirecting...', 'success');
                     setTimeout(() => {
                         window.location.href = 'admin.html';
@@ -327,20 +326,14 @@
         }
 
         window.addEventListener('load', function() {
-            const token = localStorage.getItem('adminToken');
-            if (token) {
-                fetch('/api/admin/verify', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                })
+            // Session cookie decides; no token needed in the browser.
+            fetch('/api/admin/session')
                 .then(response => {
                     if (response.ok) {
                         window.location.href = 'admin.html';
                     }
                 })
                 .catch(() => {});
-            }
         });
     </script>
 </body>

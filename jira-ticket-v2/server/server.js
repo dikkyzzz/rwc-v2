@@ -17,6 +17,10 @@ const {
     verifyPassword,
     setMonitoringSessionCookie,
     clearMonitoringSessionCookie,
+    setAdminSessionCookie,
+    clearAdminSessionCookie,
+    parseCookies,
+    ADMIN_SESSION_COOKIE,
     hasGlobalMonitoringAccess,
     getMonitoringSessionFromRequest,
     authenticateMonitoring,
@@ -179,6 +183,12 @@ app.post('/api/admin/login', async (req, res) => {
             createdAt: Date.now()
         });
 
+        // Store the admin token in an httpOnly cookie too, so the browser does
+        // not need to keep it in localStorage where any XSS could read it.
+        // `token` is still returned for non-browser clients and for the
+        // Bearer header the existing pages send.
+        setAdminSessionCookie(req, res, token, isSecureRequest);
+
         res.json({
             message: 'Login berhasil',
             token,
@@ -322,11 +332,24 @@ app.post('/api/admin/logout', (req, res) => {
     const authHeader = req.headers.authorization;
 
     if (authHeader && authHeader.startsWith('Bearer ')) {
-        const token = authHeader.substring(7);
-        sessions.delete(token);
+        sessions.delete(authHeader.substring(7));
     }
 
+    // Also drop the httpOnly cookie session, if that is how this client
+    // authenticated.
+    const cookies = parseCookies(req);
+    if (cookies[ADMIN_SESSION_COOKIE]) {
+        sessions.delete(cookies[ADMIN_SESSION_COOKIE]);
+    }
+    clearAdminSessionCookie(req, res, isSecureRequest);
+
     res.json({ message: 'Logout berhasil' });
+});
+
+// Current admin session, used by the pages to restore state after a reload
+// without reading the token from localStorage.
+app.get('/api/admin/session', authenticateAdmin, (req, res) => {
+    res.json({ user: req.admin });
 });
 
 app.post('/api/monitoring/login', async (req, res) => {

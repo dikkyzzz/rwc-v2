@@ -631,31 +631,22 @@
 
         // Function to check authentication
         async function checkAuth() {
-            const token = localStorage.getItem('adminToken');
-            if (!token) {
-                window.location.href = 'admin-login.html';
-                return;
-            }
-
+            // The session lives in an httpOnly cookie, so this works even with
+            // no token in localStorage. A stale Bearer token is still sent when
+            // present, for backwards compatibility.
             try {
-                const response = await fetch('/api/admin/verify', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
+                const response = await fetch('/api/admin/session', {
+                    headers: getAuthHeaders()
                 });
 
                 if (!response.ok) {
-                    localStorage.removeItem('adminToken');
-                    localStorage.removeItem('adminUser');
-                    localStorage.removeItem('adminSession');
+                    clearLocalAuth();
                     window.location.href = 'admin-login.html';
                     return;
                 }
 
                 const data = await response.json();
                 adminSession = data.user;
-                localStorage.setItem('adminUser', adminSession.displayName || adminSession.email);
-                localStorage.setItem('adminSession', JSON.stringify(adminSession));
 
                 document.getElementById('adminUser').textContent = adminSession.displayName || adminSession.email;
                 document.getElementById('adminRoleLabel').textContent = formatRoleLabel(adminSession.role);
@@ -668,20 +659,25 @@
                 }
             } catch (error) {
                 console.error('Auth check failed:', error);
-                localStorage.removeItem('adminToken');
-                localStorage.removeItem('adminUser');
-                localStorage.removeItem('adminSession');
+                clearLocalAuth();
                 window.location.href = 'admin-login.html';
             }
         }
 
+        function clearLocalAuth() {
+            localStorage.removeItem('adminToken');
+            localStorage.removeItem('adminUser');
+            localStorage.removeItem('adminSession');
+        }
+
         // Function to get auth headers
         function getAuthHeaders() {
+            const headers = { 'Content-Type': 'application/json' };
             const token = localStorage.getItem('adminToken');
-            return {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            };
+            // Cookie is the primary channel; only attach a Bearer token when a
+            // legacy client still has one stored.
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+            return headers;
         }
 
         // Function to logout

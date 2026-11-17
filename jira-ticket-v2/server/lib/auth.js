@@ -9,6 +9,7 @@ const monitoringSessions = new PersistentSessionStore('monitoring');
 
 const SESSION_MAX_AGE_MS = 24 * 60 * 60 * 1000;
 const MONITORING_SESSION_COOKIE = 'monitoring_session';
+const ADMIN_SESSION_COOKIE = 'admin_session';
 const DEFAULT_MONITORING_PASSWORD = 'ChangeMe123!';
 const MONITORING_PRIVILEGED_SEEDS = [
     { email: 'superadmin@rwc.local', displayName: 'Super Admin', role: 'super_admin' },
@@ -98,6 +99,36 @@ function clearMonitoringSessionCookie(req, res, isSecureRequest) {
     res.setHeader('Set-Cookie', cookieParts.join('; '));
 }
 
+
+function setAdminSessionCookie(req, res, token, isSecureRequest) {
+    const cookieParts = [
+        `${ADMIN_SESSION_COOKIE}=${encodeURIComponent(token)}`,
+        'Path=/',
+        `Max-Age=${Math.floor(SESSION_MAX_AGE_MS / 1000)}`,
+        'HttpOnly',
+        'SameSite=Lax'
+    ];
+    if (isSecureRequest(req)) {
+        cookieParts.push('Secure');
+    }
+    res.setHeader('Set-Cookie', cookieParts.join('; '));
+}
+
+function clearAdminSessionCookie(req, res, isSecureRequest) {
+    const cookieParts = [
+        `${ADMIN_SESSION_COOKIE}=`,
+        'Path=/',
+        'Max-Age=0',
+        'Expires=Thu, 01 Jan 1970 00:00:00 GMT',
+        'HttpOnly',
+        'SameSite=Lax'
+    ];
+    if (isSecureRequest(req)) {
+        cookieParts.push('Secure');
+    }
+    res.setHeader('Set-Cookie', cookieParts.join('; '));
+}
+
 function hasGlobalMonitoringAccess(user) {
     return !!user && (user.role === 'admin' || user.role === 'super_admin');
 }
@@ -161,12 +192,22 @@ function monitoringPageAuth(req, res, next) {
 
 function authenticateAdmin(req, res, next) {
     const authHeader = req.headers.authorization;
+    let token = null;
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({ message: 'Token tidak ditemukan' });
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+        token = authHeader.substring(7);
     }
 
-    const token = authHeader.substring(7);
+    // Fall back to the httpOnly cookie so the browser never has to expose the
+    // token to JavaScript.
+    if (!token) {
+        const cookies = parseCookies(req);
+        token = cookies[ADMIN_SESSION_COOKIE] || null;
+    }
+
+    if (!token) {
+        return res.status(401).json({ message: 'Token tidak ditemukan' });
+    }
 
     if (!sessions.has(token)) {
         return res.status(401).json({ message: 'Token tidak valid' });
@@ -194,6 +235,9 @@ function requireSuperAdmin(req, res, next) {
 
 module.exports = {
     sessions,
+    ADMIN_SESSION_COOKIE,
+    setAdminSessionCookie,
+    clearAdminSessionCookie,
     monitoringSessions,
     SESSION_MAX_AGE_MS,
     MONITORING_SESSION_COOKIE,
