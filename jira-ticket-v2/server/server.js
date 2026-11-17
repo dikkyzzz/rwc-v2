@@ -2264,11 +2264,11 @@ async function startServer() {
         await initializeMonitoringUsers();
 
         // Jalankan scraping setiap 30 menit
-        const scrapeIssues = require('./scrape');
+        const fetchIssues = require('./jira-client');
         setInterval(async () => {
             try {
                 console.log("🔄 Memperbarui data issue...");
-                await scrapeIssues();
+                await fetchIssues();
             } catch (error) {
                 console.error('❌ Error running scheduled scrape:', error);
             }
@@ -2278,7 +2278,7 @@ async function startServer() {
             console.log(`🌐 Server berjalan di http://localhost:${PORT}`);
 
             // Jalankan scrape awal tanpa menahan server startup.
-            scrapeIssues().catch((error) => {
+            fetchIssues().catch((error) => {
                 console.error('❌ Error running initial scrape:', error);
             });
         });

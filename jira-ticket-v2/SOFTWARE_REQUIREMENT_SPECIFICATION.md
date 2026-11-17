@@ -81,7 +81,7 @@ SRS ini disusun dari inspeksi implementasi aktual, terutama pada file-file berik
 - `public/index.html`, `public/stats.html`, `public/report.html`
 - `public/about.html`, `public/contact.html`
 - `public/admin-login.html`, `public/admin.html`
-- `server/server.js`, `server/scrape.js`
+- `server/server.js`, `server/jira-client.js`
 - `server/config/database.js`, `server/sql/init.sql`
 - `wdqms/index.php`
 - `wdqms/gbon/land_surface/index.php`

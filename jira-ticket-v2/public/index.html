@@ -1227,21 +1227,21 @@
 
                     row.innerHTML = `
                 <td>${start + index + 1}</td>
-                <td><a href="https://jira.wmo.int/browse/${issue.key}" target="_blank">${issue.key}</a></td>
+                <td><a href="https://jira.wmo.int/browse/${encodeURIComponent(issue.key)}" target="_blank">${escapeHtml(issue.key)}</a></td>
                 <td>
-                    <a href="#" class="summary-link" data-summary="${issue.summary}" data-bs-toggle="modal" data-bs-target="#summaryModal">
+                    <a href="#" class="summary-link" data-summary="${escapeHtml(issue.summary)}" data-bs-toggle="modal" data-bs-target="#summaryModal">
                         ${truncateText(issue.summary, 25)}
                     </a>
                 </td>
-                <td><span class="badge" style="background-color: ${getColorForStatus(issue.status?.toLowerCase())}; color: ${['open', 'to do', 'under investigation', 'triage'].includes(issue.status?.toLowerCase()) ? '#000' : '#fff'}; border: 1px solid #dee2e6;">${issue.status || 'Unknown'}</span></td>
-                <td>${issue.assignee || 'Unassigned'}</td>
-                <td>${issue.reporter || '-'}</td>
-                <td>${issue.priority || '-'}</td>
-                <td>${issue.created || '-'}</td>
-                <td>${issue.updated || '-'}</td>
-                <td>${issue.wigosIssueCategory || '-'}</td>
+                <td><span class="badge" style="background-color: ${getColorForStatus(issue.status?.toLowerCase())}; color: ${['open', 'to do', 'under investigation', 'triage'].includes(issue.status?.toLowerCase()) ? '#000' : '#fff'}; border: 1px solid #dee2e6;">${escapeHtml(issue.status || 'Unknown')}</span></td>
+                <td>${escapeHtml(issue.assignee || 'Unassigned')}</td>
+                <td>${escapeHtml(issue.reporter || '-')}</td>
+                <td>${escapeHtml(issue.priority || '-')}</td>
+                <td>${escapeHtml(issue.created || '-')}</td>
+                <td>${escapeHtml(issue.updated || '-')}</td>
+                <td>${escapeHtml(issue.wigosIssueCategory || '-')}</td>
                 <td>
-                    <a href="#" class="description-link" data-description="${issue.description || 'Tidak ada deskripsi'}" data-bs-toggle="modal" data-bs-target="#descriptionModal">
+                    <a href="#" class="description-link" data-description="${escapeHtml(issue.description || 'Tidak ada deskripsi')}" data-bs-toggle="modal" data-bs-target="#descriptionModal">
                         ${truncateText(issue.description, 25) || '-'}
                     </a>
                 </td>
@@ -1489,6 +1489,17 @@
                 displayData(currentPage);
                 setupPagination();
                 renderChart(); // Perbarui chart jika diperlukan berdasarkan data yang diurutkan
+            }
+
+            // Issue fields come from Jira WMO (third-party input), so they must be
+            // escaped before being interpolated into innerHTML.
+            function escapeHtml(value) {
+                return String(value === null || value === undefined ? '' : value)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#39;');
             }
 
             function truncateText(text, maxLength) {

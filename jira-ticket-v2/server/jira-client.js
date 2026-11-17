@@ -1,4 +1,4 @@
-// server/scrape.js
+// server/jira-client.js
 require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') });
 
 const axios = require('axios');
@@ -197,14 +197,14 @@ function mapIssue(issue, wigosFields) {
 
 let isScraping = false; // 🔒 Cegah eksekusi ganda
 
-async function scrapeIssues() {
+async function fetchIssues() {
     if (isScraping) {
-        logToFile("⏳ Scraping sedang berjalan, skip...");
+        logToFile("⏳ Pengambilan data masih berjalan, skip...");
         return;
     }
 
     if (!buildAuthHeader()) {
-        logToFile("❌ JIRA_API_TOKEN belum diisi. Scraping dibatalkan (login username/password sudah tidak dipakai).");
+        logToFile("❌ JIRA_API_TOKEN belum diisi. Pengambilan data dibatalkan (Jira WMO memakai Personal Access Token).");
         return;
     }
 
@@ -304,14 +304,14 @@ if (require.main === module) {
     // Jalankan scraping otomatis setiap 30 menit
     setInterval(async () => {
         console.log("🔄 Memperbarui data issue...");
-        await scrapeIssues();
+        await fetchIssues();
     }, 30 * 60 * 1000);
 
     // Jalankan sekali saat script dijalankan langsung
-    scrapeIssues();
+    fetchIssues();
 }
 
-module.exports = scrapeIssues;
+module.exports = fetchIssues;
 module.exports.formatJiraDate = formatJiraDate;
 module.exports.fieldToText = fieldToText;
 module.exports.descriptionToText = descriptionToText;

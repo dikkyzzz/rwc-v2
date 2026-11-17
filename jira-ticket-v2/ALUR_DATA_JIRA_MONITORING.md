@@ -11,7 +11,7 @@ Jira Monitoring adalah modul berbasis **Node.js** (`/server`) yang mengambil dat
 | Komponen | Teknologi | Lokasi |
 |----------|-----------|--------|
 | Sumber data | Jira WMO | `https://jira.wmo.int` |
-| Scraper | Node.js + Puppeteer (headless) | `server/scrape.js` |
+| Jira client | Node.js + REST API v2 (Personal Access Token) | `server/jira-client.js` |
 | Penyimpanan issue | File JSON | `issues.json` |
 | Database referensi | MySQL | DB `jira`, tabel `country` |
 | Web server / API | Node.js (Express) | `server/server.js` |
@@ -21,7 +21,7 @@ Jira Monitoring adalah modul berbasis **Node.js** (`/server`) yang mengambil dat
 
 ## 2. Sumber Data
 
-Scraper login ke Jira WMO via **SAML SSO**, lalu menjalankan query JQL:
+`jira-client.js` memanggil **Jira REST API v2** dengan Personal Access Token, lalu menjalankan query JQL:
 
 ```
 reporter in ("RWC Indonesia") ORDER BY created DESC
@@ -44,7 +44,7 @@ Field yang di-*scrape* per issue:
 
 ```mermaid
 flowchart TD
-    A[Jira WMO<br/>jira.wmo.int] -->|SAML SSO Login| B[scrape.js<br/>Puppeteer headless]
+    A[Jira WMO<br/>jira.wmo.int] -->|REST API v2 + PAT| B[jira-client.js]
 
     B -->|Muat cookie| C{Cookie valid?}
     C -->|Ya| D[Lewati login]
@@ -81,7 +81,7 @@ Scraper berjalan otomatis dengan `setInterval` (default tiap 30 menit) dan dijag
 ```mermaid
 sequenceDiagram
     participant T as Timer (setInterval 30 min)
-    participant S as scrape.js
+    participant S as jira-client.js
     participant L as Lock (isScraping)
     participant J as Jira WMO
     participant F as issues.json
@@ -95,7 +95,7 @@ sequenceDiagram
         S->>LOG: "Scraping sedang berjalan, skip"
     else Idle
         L-->>S: false (set true)
-        S->>J: Login SAML SSO + Query JQL
+        S->>J: GET /rest/api/2/search (Bearer PAT)
         J-->>S: HTML hasil pencarian
         S->>S: Parse baris issue (5 halaman)
         alt Total issue > 0
@@ -122,7 +122,7 @@ flowchart LR
         R4[Safety guard<br/>tidak timpa dgn 0 issue]
     end
 
-    SCRAPE[scrape.js] --> R1
+    SCRAPE[jira-client.js] --> R1
     SCRAPE --> R2
     SCRAPE --> R3
     SCRAPE --> R4
@@ -167,7 +167,7 @@ flowchart TD
         JIRA[Jira WMO]
     end
     subgraph Backend_Node
-        SCRAPE[scrape.js + Puppeteer]
+        SCRAPE[jira-client.js]
         JSON[(issues.json)]
         SRV[server.js Express]
         DB[(MySQL country)]
@@ -177,7 +177,7 @@ flowchart TD
         CHART[Grafik &amp; Statistik]
     end
 
-    JIRA -->|SAML SSO + JQL scraping| SCRAPE
+    JIRA -->|REST API v2 + JQL| SCRAPE
     SCRAPE --> JSON
     JSON --> SRV
     DB --> SRV
@@ -191,4 +191,4 @@ flowchart TD
 
 ---
 
-*Dokumen dibuat berdasarkan analisis kode: `server/scrape.js`, `server/config/database.js`, `jira.sql`, dan `issues.json`.*
+*Dokumen dibuat berdasarkan analisis kode: `server/jira-client.js`, `server/config/database.js`, `jira.sql`, dan `issues.json`.*
