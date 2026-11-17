@@ -1,10 +1,11 @@
 // server/lib/auth.js
 // Session store, password hashing, cookie helpers and auth middleware.
 const crypto = require('crypto');
+const { PersistentSessionStore } = require('./session-store');
 
-// Simple in-memory session store (untuk production, gunakan Redis atau database)
-const sessions = new Map();
-const monitoringSessions = new Map();
+// Sessions survive restarts: in-memory cache + MySQL mirror.
+const sessions = new PersistentSessionStore('admin');
+const monitoringSessions = new PersistentSessionStore('monitoring');
 
 const SESSION_MAX_AGE_MS = 24 * 60 * 60 * 1000;
 const MONITORING_SESSION_COOKIE = 'monitoring_session';

@@ -9,6 +9,7 @@ const db = require('./config/database'); // Update ke MySQL config
 const {
     sessions,
     monitoringSessions,
+    SESSION_MAX_AGE_MS,
     DEFAULT_MONITORING_PASSWORD,
     MONITORING_PRIVILEGED_SEEDS,
     generateToken,
@@ -23,6 +24,7 @@ const {
     authenticateAdmin,
     requireSuperAdmin,
 } = require('./lib/auth');
+const { hashToken, ensureSessionTable } = require('./lib/session-store');
 const {
     getCountryRows,
     buildCountryMatchers,
@@ -416,11 +418,9 @@ app.post('/api/monitoring/change-password', authenticateMonitoring, async (req, 
         );
 
         const user = mapMonitoringUserRow(rows[0]);
-        monitoringSessions.forEach((session, token) => {
-            if (session?.user?.id === user.id && token !== req.monitoringSessionToken) {
-                monitoringSessions.delete(token);
-            }
-        });
+        // Invalidate this user's other sessions; the current one is refreshed
+        // below so the user stays logged in where they changed the password.
+        monitoringSessions.deleteByUserId(user.id, hashToken(req.monitoringSessionToken));
 
         monitoringSessions.set(req.monitoringSessionToken, {
             user,
@@ -2144,7 +2144,13 @@ async function startServer() {
 
         await initializeMonitoringUsers();
 
-        // Jalankan scraping setiap 30 menit
+        // Persisted sessions: create the table, then reload unexpired rows so
+        // a restart no longer logs everyone out.
+        await ensureSessionTable();
+        await sessions.load(SESSION_MAX_AGE_MS);
+        await monitoringSessions.load(SESSION_MAX_AGE_MS);
+
+        // Jalankan pengambilan data setiap 30 menit
         const fetchIssues = require('./jira-client');
         setInterval(async () => {
             try {
