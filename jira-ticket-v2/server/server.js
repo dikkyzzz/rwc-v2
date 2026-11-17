@@ -6,6 +6,32 @@ const path = require('path');
 const CHARTJS_CONTENT = fs.readFileSync(path.join(__dirname, 'chart.min.js'), 'utf8');
 const crypto = require('crypto');
 const db = require('./config/database'); // Update ke MySQL config
+const {
+    sessions,
+    monitoringSessions,
+    DEFAULT_MONITORING_PASSWORD,
+    MONITORING_PRIVILEGED_SEEDS,
+    generateToken,
+    createPasswordHash,
+    verifyPassword,
+    setMonitoringSessionCookie,
+    clearMonitoringSessionCookie,
+    hasGlobalMonitoringAccess,
+    getMonitoringSessionFromRequest,
+    authenticateMonitoring,
+    monitoringPageAuth,
+    authenticateAdmin,
+    requireSuperAdmin,
+} = require('./lib/auth');
+const {
+    getCountryRows,
+    buildCountryMatchers,
+    extractCountryFromSummary,
+    readIssuesData,
+    filterIssuesForMonitoringUser,
+    filterCountryRowsForMonitoringUser,
+    initializeMonitoringUsers,
+} = require('./lib/monitoring-users');
 const AdmZip = require('adm-zip');
 const puppeteer = require('puppeteer');
 const { createReport } = require('docx-templates');
@@ -26,6 +52,8 @@ const PORT = process.env.PORT || 7000;
 // WDQMS v2 (FastAPI + Next.js) menggantikan aplikasi PHP v1.
 const WDQMS_V2_API_URL = (process.env.WDQMS_V2_API_URL || 'http://localhost:8000').replace(/\/+$/, '');
 const WDQMS_V2_WEB_URL = (process.env.WDQMS_V2_WEB_URL || 'http://localhost:3000').replace(/\/+$/, '');
+
+let monthlyReportGenerationInProgress = false;
 
 function isSecureRequest(req) {
     if (req.secure || req.protocol === 'https') {
@@ -57,6 +85,7 @@ app.use('/logo-full.svg', express.static(path.join(__dirname, '../logo-update.sv
 app.use('/logo-icon.svg', express.static(path.join(__dirname, '../logo-icon.svg')));
 app.use('/logo-bmkg.png', express.static(path.join(__dirname, '../logo-bmkg.webp')));
 app.use('/', express.static(path.join(__dirname, '../../landingpage')));
+app.use('/monitoring', monitoringPageAuth, express.static(path.join(__dirname, '../public')));
 // Aplikasi WDQMS v1 (PHP) sudah dipindahkan ke WDQMS v2. Arahkan semua
 // permintaan /wdqms/* ke frontend v2 (Next.js).
 app.use('/wdqms', (req, res) => {
@@ -69,333 +98,6 @@ app.use('/wdqms', (req, res) => {
 // === AUTHENTICATION SYSTEM ===
 
 // Simple in-memory session store (untuk production, gunakan Redis atau database)
-const sessions = new Map();
-const monitoringSessions = new Map();
-let monthlyReportGenerationInProgress = false;
-const SESSION_MAX_AGE_MS = 24 * 60 * 60 * 1000;
-const MONITORING_SESSION_COOKIE = 'monitoring_session';
-const DEFAULT_MONITORING_PASSWORD = 'ChangeMe123!';
-const MONITORING_PRIVILEGED_SEEDS = [
-    { email: 'superadmin@rwc.local', displayName: 'Super Admin', role: 'super_admin' },
-    { email: 'rwc.indonesia@rwc.local', displayName: 'RWC Indonesia', role: 'admin' },
-    { email: 'wmo.secretariat@rwc.local', displayName: 'WMO Secretariat', role: 'admin' },
-    { email: 'wmo.centre@rwc.local', displayName: 'WMO Centre', role: 'admin' }
-];
-
-// Generate session token
-function generateToken() {
-    return crypto.randomBytes(32).toString('hex');
-}
-
-function createPasswordHash(password) {
-    const salt = crypto.randomBytes(16).toString('hex');
-    const hash = crypto.scryptSync(password, salt, 64).toString('hex');
-    return `${salt}:${hash}`;
-}
-
-function verifyPassword(password, storedHash) {
-    if (!storedHash || !storedHash.includes(':')) {
-        return false;
-    }
-
-    const [salt, hash] = storedHash.split(':');
-    if (!salt || !hash) {
-        return false;
-    }
-
-    const computedHash = crypto.scryptSync(password, salt, 64).toString('hex');
-    const storedBuffer = Buffer.from(hash, 'hex');
-    const computedBuffer = Buffer.from(computedHash, 'hex');
-
-    if (storedBuffer.length !== computedBuffer.length) {
-        return false;
-    }
-
-    return crypto.timingSafeEqual(storedBuffer, computedBuffer);
-}
-
-function parseCookies(req) {
-    const cookieHeader = req.headers.cookie || '';
-    return cookieHeader.split(';').reduce((cookies, part) => {
-        const trimmed = part.trim();
-        if (!trimmed) return cookies;
-
-        const separatorIndex = trimmed.indexOf('=');
-        if (separatorIndex === -1) return cookies;
-
-        const key = trimmed.slice(0, separatorIndex).trim();
-        const value = trimmed.slice(separatorIndex + 1).trim();
-        cookies[key] = decodeURIComponent(value);
-        return cookies;
-    }, {});
-}
-
-function setMonitoringSessionCookie(req, res, token) {
-    const cookieParts = [
-        `${MONITORING_SESSION_COOKIE}=${encodeURIComponent(token)}`,
-        'Path=/',
-        `Max-Age=${Math.floor(SESSION_MAX_AGE_MS / 1000)}`,
-        'HttpOnly',
-        'SameSite=Lax'
-    ];
-
-    if (isSecureRequest(req)) {
-        cookieParts.push('Secure');
-    }
-
-    res.setHeader('Set-Cookie', cookieParts.join('; '));
-}
-
-function clearMonitoringSessionCookie(req, res) {
-    const cookieParts = [
-        `${MONITORING_SESSION_COOKIE}=`,
-        'Path=/',
-        'Max-Age=0',
-        'Expires=Thu, 01 Jan 1970 00:00:00 GMT',
-        'HttpOnly',
-        'SameSite=Lax'
-    ];
-
-    if (isSecureRequest(req)) {
-        cookieParts.push('Secure');
-    }
-
-    res.setHeader('Set-Cookie', cookieParts.join('; '));
-}
-
-function hasGlobalMonitoringAccess(user) {
-    return !!user && (user.role === 'admin' || user.role === 'super_admin');
-}
-
-function getMonitoringSessionFromRequest(req) {
-    const cookies = parseCookies(req);
-    const token = cookies[MONITORING_SESSION_COOKIE];
-
-    if (!token || !monitoringSessions.has(token)) {
-        return null;
-    }
-
-    const session = monitoringSessions.get(token);
-    if (!session || Date.now() - session.createdAt > SESSION_MAX_AGE_MS) {
-        monitoringSessions.delete(token);
-        return null;
-    }
-
-    return { token, session };
-}
-
-function authenticateMonitoring(req, res, next) {
-    const sessionInfo = getMonitoringSessionFromRequest(req);
-    if (!sessionInfo) {
-        return res.status(401).json({ message: 'Monitoring session is invalid' });
-    }
-
-    req.monitoringUser = sessionInfo.session.user;
-    req.monitoringSessionToken = sessionInfo.token;
-    next();
-}
-
-function monitoringPageAuth(req, res, next) {
-    const pathName = req.path || '/';
-    const allowedWithoutMonitoringLogin = new Set([
-        '/monitoring-login.html',
-        '/admin-login.html',
-        '/admin.html'
-    ]);
-
-    if (allowedWithoutMonitoringLogin.has(pathName)) {
-        if (pathName === '/monitoring-login.html' && getMonitoringSessionFromRequest(req)) {
-            return res.redirect('/monitoring/index.html');
-        }
-        return next();
-    }
-
-    const protectedPages = new Set(['/', '/index.html', '/stats.html', '/report.html', '/about.html', '/contact.html']);
-    if (!protectedPages.has(pathName)) {
-        return next();
-    }
-
-    const sessionInfo = getMonitoringSessionFromRequest(req);
-    if (!sessionInfo) {
-        return res.redirect('/monitoring/monitoring-login.html');
-    }
-
-    req.monitoringUser = sessionInfo.session.user;
-    next();
-}
-
-app.use('/monitoring', monitoringPageAuth, express.static(path.join(__dirname, '../public')));
-
-async function getCountryRows() {
-    return db.query("SELECT id, name, country_code FROM country ORDER BY name");
-}
-
-function buildCountryMatchers(rows) {
-    const matchers = [];
-    const seenKeys = new Set();
-
-    rows.forEach((row) => {
-        [row.name, row.country_code].forEach((rawKey) => {
-            const key = String(rawKey || '').trim().toLowerCase();
-            if (!key || seenKeys.has(key)) return;
-
-            seenKeys.add(key);
-            matchers.push({
-                key,
-                name: row.name,
-                countryCode: row.country_code
-            });
-        });
-    });
-
-    matchers.sort((a, b) => b.key.length - a.key.length);
-    return matchers;
-}
-
-function extractCountryFromSummary(summary, countryMatchers) {
-    const summaryText = String(summary || '').toLowerCase();
-    for (const matcher of countryMatchers) {
-        if (summaryText.includes(matcher.key)) {
-            return matcher.name;
-        }
-    }
-    return null;
-}
-
-async function readIssuesData() {
-    const filePath = path.join(__dirname, '../issues.json');
-    const data = await fs.promises.readFile(filePath, 'utf8');
-    return JSON.parse(data);
-}
-
-function filterIssuesForMonitoringUser(issues, monitoringUser, countryMatchers) {
-    if (!monitoringUser || hasGlobalMonitoringAccess(monitoringUser) || !monitoringUser.accessCountryName) {
-        return issues;
-    }
-
-    const allowedCountry = String(monitoringUser.accessCountryName).toLowerCase();
-    return issues.filter((issue) => {
-        const issueCountry = extractCountryFromSummary(issue.summary, countryMatchers);
-        return issueCountry && issueCountry.toLowerCase() === allowedCountry;
-    });
-}
-
-function filterCountryRowsForMonitoringUser(rows, monitoringUser) {
-    if (!monitoringUser || hasGlobalMonitoringAccess(monitoringUser) || !monitoringUser.accessCountryName) {
-        return rows;
-    }
-
-    const allowedCountryName = String(monitoringUser.accessCountryName).toLowerCase();
-    const allowedCountryCode = String(monitoringUser.accessCountryCode || '').toLowerCase();
-
-    return rows.filter((row) => {
-        const rowName = String(row.name || '').toLowerCase();
-        const rowCode = String(row.country_code || '').toLowerCase();
-        return rowName === allowedCountryName || (allowedCountryCode && rowCode === allowedCountryCode);
-    });
-}
-
-async function initializeMonitoringUsers() {
-    const slugifyEmailSegment = (value) => {
-        return String(value || '')
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/^-+|-+$/g, '');
-    };
-
-    const createTableSQL = `
-        CREATE TABLE IF NOT EXISTS monitoring_user (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            email VARCHAR(191) NOT NULL UNIQUE,
-            password_hash VARCHAR(255) NOT NULL,
-            role ENUM('super_admin', 'admin', 'user') NOT NULL,
-            display_name VARCHAR(191) NOT NULL,
-            access_country_name VARCHAR(191) NULL,
-            access_country_code VARCHAR(100) NULL,
-            is_active TINYINT(1) NOT NULL DEFAULT 1,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-    `;
-
-    await db.execute(createTableSQL);
-    await db.execute(`ALTER TABLE monitoring_user MODIFY role ENUM('super_admin', 'admin', 'user') NOT NULL`);
-    await db.execute(`ALTER TABLE monitoring_user MODIFY access_country_name VARCHAR(191) NULL`);
-    await db.execute(`ALTER TABLE monitoring_user MODIFY access_country_code VARCHAR(100) NULL`);
-
-    for (const privilegedUser of MONITORING_PRIVILEGED_SEEDS) {
-        await db.execute(
-            `INSERT INTO monitoring_user (email, password_hash, role, display_name, access_country_name, access_country_code, is_active)
-             VALUES (?, ?, ?, ?, NULL, NULL, 1)
-             ON DUPLICATE KEY UPDATE
-                role = VALUES(role),
-                display_name = VALUES(display_name),
-                access_country_name = VALUES(access_country_name),
-                access_country_code = VALUES(access_country_code),
-                is_active = 1`,
-            [privilegedUser.email, createPasswordHash(DEFAULT_MONITORING_PASSWORD), privilegedUser.role, privilegedUser.displayName]
-        );
-    }
-
-    const countries = await getCountryRows();
-    for (const country of countries) {
-        const emailSegment = slugifyEmailSegment(country.name || country.country_code);
-        if (!emailSegment) continue;
-
-        const email = `nfp.${emailSegment}@rwc.local`;
-        const displayName = `NFP WDQMS ${country.name}`;
-        const existingUsers = await db.query(
-            `SELECT id FROM monitoring_user
-             WHERE role = 'user' AND access_country_name = ?
-             LIMIT 1`,
-            [country.name]
-        );
-        if (existingUsers.length > 0) {
-            continue;
-        }
-
-        await db.execute(
-            `INSERT INTO monitoring_user (email, password_hash, role, display_name, access_country_name, access_country_code, is_active)
-             VALUES (?, ?, 'user', ?, ?, ?, 1)`,
-            [email, createPasswordHash(DEFAULT_MONITORING_PASSWORD), displayName, country.name, country.country_code]
-        );
-    }
-}
-
-// Middleware untuk autentikasi admin
-function authenticateAdmin(req, res, next) {
-    const authHeader = req.headers.authorization;
-
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({ message: 'Token tidak ditemukan' });
-    }
-
-    const token = authHeader.substring(7);
-
-    if (!sessions.has(token)) {
-        return res.status(401).json({ message: 'Token tidak valid' });
-    }
-
-    const session = sessions.get(token);
-
-    // Check if session is expired (24 hours)
-    if (Date.now() - session.createdAt > 24 * 60 * 60 * 1000) {
-        sessions.delete(token);
-        return res.status(401).json({ message: 'Session expired' });
-    }
-
-    req.admin = session.user;
-    next();
-}
-
-function requireSuperAdmin(req, res, next) {
-    if (!req.admin || req.admin.role !== 'super_admin') {
-        return res.status(403).json({ message: 'Akses hanya untuk super admin' });
-    }
-
-    next();
-}
-
 function mapMonitoringUserRow(row) {
     return {
         id: row.id,
@@ -681,7 +383,7 @@ app.post('/api/monitoring/login', async (req, res) => {
             createdAt: Date.now()
         });
 
-        setMonitoringSessionCookie(req, res, token);
+        setMonitoringSessionCookie(req, res, token, isSecureRequest);
         res.json({
             message: 'Monitoring login successful',
             user
@@ -725,7 +427,7 @@ app.post('/api/monitoring/change-password', authenticateMonitoring, async (req, 
 
         if (!rows.length || !rows[0].is_active) {
             monitoringSessions.delete(req.monitoringSessionToken);
-            clearMonitoringSessionCookie(req, res);
+            clearMonitoringSessionCookie(req, res, isSecureRequest);
             return res.status(401).json({ message: 'Monitoring user is inactive or was not found' });
         }
 
@@ -768,7 +470,7 @@ app.post('/api/monitoring/logout', (req, res) => {
         monitoringSessions.delete(sessionInfo.token);
     }
 
-    clearMonitoringSessionCookie(req, res);
+    clearMonitoringSessionCookie(req, res, isSecureRequest);
     res.json({ message: 'Monitoring logout successful' });
 });
 
