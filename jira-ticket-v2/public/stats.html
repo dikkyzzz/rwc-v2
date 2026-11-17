@@ -414,10 +414,17 @@
                                     <input class="form-check-input" type="checkbox" id="filterYtd">
                                     <label class="form-check-label" for="filterYtd">Year to Date</label>
                                 </div>
+                                <div id="ytdModeHint" class="form-text" hidden>
+                                    Counts tickets created this year up to the cutoff date.
+                                </div>
                             </div>
                             <div class="col-md-12">
-                                <label for="filterToDate" class="form-label">To Date:</label>
-                                <input type="date" id="filterToDate" class="form-control form-control-sm">
+                                <label for="filterToDate" class="form-label">Year to Date cutoff:</label>
+                                <input type="date" id="filterToDate" class="form-control form-control-sm"
+                                    aria-describedby="filterToDateHelp">
+                                <div id="filterToDateHelp" class="form-text">
+                                    Only used with Year to Date. Defaults to today.
+                                </div>
                             </div>
                             <!-- Tombol Apply Filter -->
                             <div class="col-md-12 text-center mt-2">
@@ -454,6 +461,33 @@
                 <div class="text-end mt-2">
                     <button id="downloadCategoryBtn" class="btn btn-sm btn-outline-secondary"
                         title="Download chart">Download Chart</button>
+                </div>
+            </div>
+
+            <!-- Numeric summary: charts alone cannot be read to an exact value -->
+            <div class="col-md-12 mt-5">
+                <h5 class="text-center mb-3" id="summaryTableTitle">Summary Numbers</h5>
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered align-middle mb-0" id="summaryTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col">Country</th>
+                                <th scope="col" class="text-end">Total</th>
+                                <th scope="col" class="text-end">Closed</th>
+                                <th scope="col" class="text-end">Open</th>
+                                <th scope="col" class="text-end">In Progress</th>
+                                <th scope="col" class="text-end">Other</th>
+                            </tr>
+                        </thead>
+                        <tbody id="summaryTableBody">
+                            <tr><td colspan="6" class="text-center text-muted py-3">Loading…</td></tr>
+                        </tbody>
+                        <tfoot id="summaryTableFoot"></tfoot>
+                    </table>
+                </div>
+                <div class="text-end mt-2">
+                    <button id="downloadSummaryCsvBtn" class="btn btn-sm btn-outline-secondary"
+                        title="Download summary as CSV">Download CSV</button>
                 </div>
             </div>
         </div>
@@ -518,6 +552,7 @@
             let countryChart;
             let countryStatusChart; // Untuk menyimpan instance chart
             let allStatsIssues = []; // Untuk menyimpan semua data issue yang diambil
+            let COUNTRIES = {};      // code/name -> display name, loaded from /api/countries
             let filteredStatsIssues = []; // Untuk menyimpan data issue yang difilter berdasarkan periode
             let currentFilterText = ''; // Untuk menyimpan text filter saat ini (untuk judul chart)
             document.addEventListener("DOMContentLoaded", () => {
@@ -545,9 +580,11 @@
                     const countryCounts = await countryRes.json();
                     const countryStatusCounts = await countryStatusRes.json();
 
+                    await loadCountryLookup();
                     renderCategoryChart(issues); // Pass issues array langsung
                     renderCountryChart(countryCounts); // Gunakan data dari API
                     renderCountryStatusChart(countryStatusCounts); // Gunakan data dari API
+                    renderSummaryTable(issues);
                 } catch (err) {
                     alert("❌ Failed to load data");
                     console.error("Error fetching issues:", err);
@@ -556,9 +593,24 @@
             // --- Fungsi untuk Menerapkan Filter Monthly Sederhana ---
             async function applyStatsPeriodFilter() {
                 const filterMonth = document.getElementById('filterMonth').value;
-                const filterYear = document.getElementById('filterYear').value;
                 const useYtd = document.getElementById('filterYtd')?.checked;
                 const filterToDate = document.getElementById('filterToDate').value;
+
+                // Year is only meaningful outside YTD mode; reject values the
+                // browser would otherwise pass through and render empty charts.
+                const yearEl = document.getElementById('filterYear');
+                let filterYear = yearEl.value.trim();
+                if (filterYear && !useYtd) {
+                    const yearNum = Number(filterYear);
+                    if (!Number.isInteger(yearNum) || yearNum < 2020 || yearNum > 2030) {
+                        yearEl.classList.add('is-invalid');
+                        yearEl.focus();
+                        return;
+                    }
+                    filterYear = String(yearNum);
+                    yearEl.value = filterYear;
+                }
+                yearEl.classList.remove('is-invalid');
 
                 // Mapping nama bulan
                 const monthNames = {
@@ -593,7 +645,9 @@
                     if (!issueCreatedStr) return false;
 
                     const issueCreatedDate = parseJiraDate(issueCreatedStr);
-                    if (isNaN(issueCreatedDate)) return false;
+                    // isNaN(null) is false, so a failed parse used to slip
+                    // through and crash on .getMonth().
+                    if (!issueCreatedDate || isNaN(issueCreatedDate.getTime())) return false;
 
                     const issueMonth = String(issueCreatedDate.getMonth() + 1).padStart(2, '0');
                     const issueYear = String(issueCreatedDate.getFullYear());
@@ -604,7 +658,10 @@
                     }
 
                     if (useYtd) {
-                        return issueCreatedDate <= selectedToDate;
+                        // Year to Date means the current year up to the cutoff,
+                        // not everything that ever happened before it.
+                        const windowStart = new Date(selectedToDate.getFullYear(), 0, 1);
+                        return issueCreatedDate >= windowStart && issueCreatedDate <= selectedToDate;
                     }
 
                     // Filter berdasarkan bulan dan tahun
@@ -633,6 +690,7 @@
                     renderCategoryChart(filteredStatsIssues); // Pass filtered issues array
                     renderCountryChart(countryCounts);
                     renderCountryStatusChart(countryStatusCounts);
+                    renderSummaryTable(filteredStatsIssues);
                 }).catch(error => {
                     console.error('Error updating charts:', error);
                     // Render chart lainnya meskipun ada error
@@ -667,7 +725,16 @@
 
                 if (filterMonthEl) filterMonthEl.disabled = !!useYtd;
                 if (filterYearEl) filterYearEl.disabled = !!useYtd;
-                if (filterToDateEl) filterToDateEl.disabled = !useYtd;
+                if (filterToDateEl) {
+                    filterToDateEl.disabled = !useYtd;
+                    filterToDateEl.title = useYtd
+                        ? 'Defaults to today when left empty'
+                        : 'Enable "Year to Date" to use a cutoff date';
+                }
+                // Tell the user why Month/Year are inert instead of leaving
+                // them greyed out with no explanation.
+                const hint = document.getElementById('ytdModeHint');
+                if (hint) hint.hidden = !useYtd;
             }
 
             // --- Fungsi untuk Update Judul Chart ---
@@ -707,7 +774,7 @@
                     issues.forEach(issue => {
                         const summary = issue.summary?.toLowerCase() || '';
                         for (const [key, name] of Object.entries(countries)) {
-                            if (summary.includes(key)) {
+                            if (matchesCountryToken(summary, key)) {
                                 counts[name] = (counts[name] || 0) + 1;
                                 break; // Hentikan pencarian setelah menemukan satu
                             }
@@ -721,6 +788,14 @@
                 }
             }
             // Fungsi untuk menghitung issues per country dan status berdasarkan data yang difilter
+            // Country codes are matched as whole tokens: a plain
+            // summary.includes('us') matched "Muscat" and filed Oman under US.
+            function matchesCountryToken(summary, needle) {
+                if (!needle) return false;
+                const escaped = needle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                return new RegExp(`(^|[^a-z0-9])${escaped}([^a-z0-9]|$)`, 'i').test(summary);
+            }
+
             async function countIssuesByCountryAndStatus(issues) {
                 try {
                     // Ambil data countries dari database
@@ -744,7 +819,7 @@
 
                         // Cari berdasarkan country_code dan name
                         for (const [key, name] of Object.entries(countries)) {
-                            if (summary.includes(key)) {
+                            if (matchesCountryToken(summary, key)) {
                                 foundCountryKey = key;
                                 break; // Hentikan pencarian setelah menemukan satu
                             }
@@ -882,7 +957,7 @@
 
                         let foundCountryKey = null;
                         for (const [key, name] of Object.entries(countries)) {
-                            if (summary.includes(key)) {
+                            if (matchesCountryToken(summary, key)) {
                                 foundCountryKey = key;
                                 break;
                             }
@@ -1072,6 +1147,112 @@
                 });
             }
             // --- Akhir Fungsi Baru ---
+            async function loadCountryLookup() {
+                if (Object.keys(COUNTRIES).length) return COUNTRIES;
+                try {
+                    const res = await fetch('/api/countries');
+                    if (res.ok) {
+                        const data = await res.json();
+                        data.forEach(c => {
+                            COUNTRIES[String(c.country_code || '').toLowerCase()] = c.name;
+                            COUNTRIES[String(c.name || '').toLowerCase()] = c.name;
+                        });
+                    }
+                } catch (error) {
+                    console.error('Failed to load country lookup:', error);
+                }
+                return COUNTRIES;
+            }
+
+            // --- Numeric summary table -------------------------------------
+            // Charts show shape; the table shows the exact counts a report
+            // needs. Same records, same filters.
+            function buildSummaryRows(issues) {
+                const rows = new Map();
+                issues.forEach(issue => {
+                    const summary = (issue.summary || '').toLowerCase();
+                    let country = 'Outside country list';
+                    for (const [key, name] of Object.entries(COUNTRIES)) {
+                        if (matchesCountryToken(summary, key)) { country = name; break; }
+                    }
+                    const status = (issue.status || 'unknown').toLowerCase().trim();
+                    if (!rows.has(country)) {
+                        rows.set(country, { country, total: 0, closed: 0, open: 0, inprogress: 0, other: 0 });
+                    }
+                    const r = rows.get(country);
+                    r.total += 1;
+                    if (status === 'closed') r.closed += 1;
+                    else if (status === 'open') r.open += 1;
+                    else if (status === 'in progress') r.inprogress += 1;
+                    else r.other += 1;
+                });
+                return [...rows.values()].sort((a, b) => b.total - a.total);
+            }
+
+            function renderSummaryTable(issues) {
+                const body = document.getElementById('summaryTableBody');
+                const foot = document.getElementById('summaryTableFoot');
+                if (!body) return;
+
+                const rows = buildSummaryRows(issues);
+                if (!rows.length) {
+                    body.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-3">No tickets match the current filter.</td></tr>';
+                    foot.innerHTML = '';
+                    return;
+                }
+
+                body.innerHTML = rows.map(r => `
+                    <tr>
+                        <td>${escapeStatsHtml(r.country)}</td>
+                        <td class="text-end">${r.total}</td>
+                        <td class="text-end">${r.closed}</td>
+                        <td class="text-end">${r.open}</td>
+                        <td class="text-end">${r.inprogress}</td>
+                        <td class="text-end">${r.other}</td>
+                    </tr>`).join('');
+
+                const totals = rows.reduce((acc, r) => ({
+                    total: acc.total + r.total, closed: acc.closed + r.closed,
+                    open: acc.open + r.open, inprogress: acc.inprogress + r.inprogress,
+                    other: acc.other + r.other,
+                }), { total: 0, closed: 0, open: 0, inprogress: 0, other: 0 });
+
+                foot.innerHTML = `
+                    <tr class="fw-semibold table-light">
+                        <td>Total</td>
+                        <td class="text-end">${totals.total}</td>
+                        <td class="text-end">${totals.closed}</td>
+                        <td class="text-end">${totals.open}</td>
+                        <td class="text-end">${totals.inprogress}</td>
+                        <td class="text-end">${totals.other}</td>
+                    </tr>`;
+
+                const title = document.getElementById('summaryTableTitle');
+                if (title) title.textContent = 'Summary Numbers' + currentFilterText;
+            }
+
+            function escapeStatsHtml(value) {
+                return String(value === null || value === undefined ? '' : value)
+                    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+            }
+
+            function downloadSummaryCsv() {
+                const rows = buildSummaryRows(filteredStatsIssues);
+                const header = ['Country', 'Total', 'Closed', 'Open', 'In Progress', 'Other'];
+                const lines = [header.join(',')].concat(rows.map(r =>
+                    [r.country, r.total, r.closed, r.open, r.inprogress, r.other]
+                        .map(v => typeof v === 'string' && /[",]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v)
+                        .join(',')
+                ));
+                const blob = new Blob([lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `ticket-summary${currentFilterText ? currentFilterText.replace(/[^a-z0-9]+/gi, '-') : ''}.csv`;
+                link.click();
+                URL.revokeObjectURL(link.href);
+            }
+
             // --- Event Listener untuk Filter Statistik ---
             document.getElementById('applyStatsFilterBtn')?.addEventListener('click', applyStatsPeriodFilter);
             document.getElementById('clearStatsFilterBtn')?.addEventListener('click', () => {
@@ -1099,6 +1280,7 @@
                     renderCategoryChart(filteredStatsIssues); // Pass filtered issues array
                     renderCountryChart(countryCounts);
                     renderCountryStatusChart(countryStatusCounts);
+                    renderSummaryTable(filteredStatsIssues);
                 }).catch(error => {
                     console.error('Error updating charts:', error);
                     // Render chart lainnya meskipun ada error
@@ -1107,6 +1289,7 @@
                     renderCountryStatusChart({});
                 });
             });
+            document.getElementById('downloadSummaryCsvBtn')?.addEventListener('click', downloadSummaryCsv);
             document.getElementById('filterYtd')?.addEventListener('change', syncStatsFilterMode);
             syncStatsFilterMode();
             // --- Akhir Event Listener ---
