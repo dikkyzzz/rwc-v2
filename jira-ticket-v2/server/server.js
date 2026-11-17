@@ -36,7 +36,6 @@ const pagesRouter = require('./routes/pages');
 const wdqmsRouter = require('./routes/wdqms');
 const AdmZip = require('adm-zip');
 const puppeteer = require('puppeteer');
-const { createReport } = require('docx-templates');
 
 // Each request gets its own browser — simple and reliable
 async function launchBrowserSafe() {
@@ -494,7 +493,7 @@ app.get('/api/last-updated', authenticateMonitoring, (req, res) => {
 
 // === LOGS API ENDPOINTS ===
 // GET logs/scrape.log (last N lines)
-app.get('/api/logs/scrape', async (req, res) => {
+app.get('/api/logs/scrape', authenticateAdmin, async (req, res) => {
     const linesParam = parseInt(req.query.lines, 10);
     const maxLines = Number.isFinite(linesParam) && linesParam > 0 ? Math.min(linesParam, 5000) : 1000;
     const logPath = path.join(__dirname, '../logs/scrape.log');
