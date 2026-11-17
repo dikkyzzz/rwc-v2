@@ -32,6 +32,7 @@ const {
     filterCountryRowsForMonitoringUser,
     initializeMonitoringUsers,
 } = require('./lib/monitoring-users');
+const pagesRouter = require('./routes/pages');
 const AdmZip = require('adm-zip');
 const puppeteer = require('puppeteer');
 const { createReport } = require('docx-templates');
@@ -86,6 +87,7 @@ app.use('/logo-icon.svg', express.static(path.join(__dirname, '../logo-icon.svg'
 app.use('/logo-bmkg.png', express.static(path.join(__dirname, '../logo-bmkg.webp')));
 app.use('/', express.static(path.join(__dirname, '../../landingpage')));
 app.use('/monitoring', monitoringPageAuth, express.static(path.join(__dirname, '../public')));
+app.use('/', pagesRouter);
 // Aplikasi WDQMS v1 (PHP) sudah dipindahkan ke WDQMS v2. Arahkan semua
 // permintaan /wdqms/* ke frontend v2 (Next.js).
 app.use('/wdqms', (req, res) => {
@@ -194,36 +196,6 @@ app.get('/api/admin/verify', authenticateAdmin, (req, res) => {
 });
 
 // Disable legacy public log page route
-app.get('/log', (req, res) => {
-    res.status(404).send('Not Found');
-});
-
-// Clean URLs for Activities landing pages.
-// CARA TAMBAH TRAINING/WORKSHOP BARU: copy file detail
-// landingpage/training-<slug>.html lalu daftarkan slug di bawah.
-const capacityTrainingPages = {
-    'im-metadata-wigos-tools': 'training-im-metadata-wigos-tools.html',
-};
-app.get('/activities', (req, res) => {
-    res.sendFile(path.join(__dirname, '../../landingpage/activities.html'));
-});
-app.get('/activities/capacity-development', (req, res) => {
-    res.sendFile(path.join(__dirname, '../../landingpage/capacity-development.html'));
-});
-app.get('/activities/coordination-meeting', (req, res) => {
-    res.sendFile(path.join(__dirname, '../../landingpage/coordination-meeting.html'));
-});
-app.get('/activities/capacity-development/:slug', (req, res) => {
-    const file = capacityTrainingPages[req.params.slug];
-    if (!file) {
-        return res.status(404).send('Not Found');
-    }
-    res.sendFile(path.join(__dirname, '../../landingpage', file));
-});
-
-// Backward compat: redirect URL lama ke struktur Activities baru.
-app.get('/capacity-development', (req, res) => res.redirect(301, '/activities/capacity-development'));
-app.get('/capacity-development/:slug', (req, res) => res.redirect(301, '/activities/capacity-development/' + req.params.slug));
 
 
 // Reports — list UI, monthly/yearly PDF downloads (multi-language: EN / ID), HTML detail for yearly.
