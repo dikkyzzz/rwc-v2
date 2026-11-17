@@ -321,6 +321,159 @@
             margin-bottom: .5rem;
         }
 
+        .report-section-title {
+            color: var(--primary-dark);
+            font-size: 1.15rem;
+            font-weight: 700;
+            text-align: center;
+            margin: 1.5rem 0 1rem;
+        }
+
+        /* Same blue control panel as the Statistics page. */
+        .filter-card {
+            background: linear-gradient(160deg, #f2f7ff 0%, #e8f1ff 100%);
+            border: 1px solid #cfe1fb;
+            border-radius: 14px;
+            box-shadow: 0 6px 20px rgba(19, 49, 95, 0.06);
+            padding: 18px 20px 14px;
+        }
+
+        .filter-card .form-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #334e73;
+            margin-bottom: 4px;
+        }
+
+        .filter-card .form-control,
+        .filter-card .form-select {
+            border-color: #cfe1fb;
+            background-color: #ffffff;
+            font-size: 0.86rem;
+        }
+
+        .filter-card .form-control:focus,
+        .filter-card .form-select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(47, 111, 228, 0.15);
+        }
+
+        .filter-card .form-control:disabled {
+            background-color: #eef3fb;
+        }
+
+        .filter-card-hint {
+            margin-top: 10px;
+            font-size: 0.75rem;
+            color: #6b86a8;
+        }
+
+        /* Tables: match the Statistics page — clean header, zebra rows,
+           tabular figures so numeric columns line up. */
+        .content-panel table {
+            margin-bottom: 0;
+            font-size: 0.88rem;
+            border-color: rgba(19, 49, 95, 0.08);
+        }
+
+        .content-panel table thead th {
+            background: linear-gradient(180deg, #f4f8fe 0%, #e9f1fc 100%);
+            color: var(--primary-dark);
+            font-size: 0.76rem;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            border-color: #cfe1fb;
+            padding: 11px 12px;
+            white-space: nowrap;
+            vertical-align: bottom;
+        }
+
+        .content-panel table tbody td {
+            padding: 9px 12px;
+            color: #334e73;
+            border-color: rgba(19, 49, 95, 0.06);
+            vertical-align: middle;
+        }
+
+        .content-panel table tbody tr:nth-child(even) {
+            background: #fafcff;
+        }
+
+        .content-panel table tbody tr:hover {
+            background: #f1f7ff;
+        }
+
+        .content-panel table tbody td:first-child {
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        /* Only count columns are right-aligned; station names and WIGOS ids
+           stay left-aligned so they read as text. */
+        .content-panel table td.num,
+        .content-panel table th.num {
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .content-panel table td {
+            white-space: nowrap;
+        }
+
+        /* Let the station name absorb the extra width rather than spreading it
+           across every column. */
+        #stationReportBody td:nth-child(2) {
+            width: 100%;
+            white-space: normal;
+        }
+
+
+        .content-panel table tfoot th {
+            background: linear-gradient(180deg, #eef5ff 0%, #e4eefc 100%);
+            color: var(--primary-dark);
+            font-weight: 700;
+            border-top: 2px solid #cfe1fb;
+            padding: 11px 12px;
+        }
+
+        /* Status overview reads as a stat list, not a page of badges. */
+        .summary-box {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent);
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(19, 49, 95, 0.06);
+            padding: 1.25rem 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .summary-box h2 {
+            color: var(--primary-dark);
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .summary-box .list-group-item {
+            padding: 0.55rem 0;
+            font-size: 0.9rem;
+            color: #334e73;
+            background: transparent;
+        }
+
+        /* Bootstrap's .d-flex overrides the `hidden` attribute, so state it
+           explicitly for the rows hideZeroStatusRows() removes. */
+        .summary-box .list-group-item[hidden] {
+            display: none !important;
+        }
+
+        .summary-box .badge {
+            font-size: 0.78rem;
+            font-weight: 700;
+            min-width: 44px;
+            font-variant-numeric: tabular-nums;
+        }
+
         .pagination .page-link {
             color: var(--primary-dark);
             border-color: var(--border);
@@ -421,10 +574,9 @@
         </section>
         <div class="content-panel">
 
-        <center>
-            <h2 class="mb-3">Ticket Count by Station</h2>
-        </center>
-        <div class="row g-2 align-items-end mb-2">
+        <h2 class="report-section-title">Ticket Count by Station</h2>
+        <div class="filter-card mb-3">
+        <div class="row g-2 align-items-end">
             <div class="col-lg-3 col-md-6">
                 <label for="stationCountryFilter" class="form-label mb-1">Country</label>
                 <select id="stationCountryFilter" class="form-select form-select-sm">
@@ -455,38 +607,42 @@
                     <option value="">All Years</option>
                 </select>
             </div>
-            <div class="col-lg-2 col-md-6">
-                <label for="stationYtdToggle" class="form-label mb-1 d-flex align-items-center gap-2">
+            <div class="col-lg-3 col-md-6">
+                <label class="form-label mb-1 d-flex align-items-center gap-2">
                     <input type="checkbox" id="stationYtdToggle" class="form-check-input mt-0">
                     <span>Year to Date</span>
                 </label>
-                <input type="date" id="stationToDateFilter" class="form-control form-control-sm" disabled>
+                <input type="date" id="stationToDateFilter" class="form-control form-control-sm" disabled
+                    aria-label="Year to Date cutoff">
             </div>
-            <div class="col-lg-2 col-md-6">
+            <div class="col-lg-3 col-md-6">
                 <label for="stationSearchInput" class="form-label mb-1">Search</label>
-                <input type="text" id="stationSearchInput" class="form-control form-control-sm" placeholder="Station / WIGOS / Country">
+                <input type="text" id="stationSearchInput" class="form-control form-control-sm"
+                    placeholder="Station / WIGOS / Country">
             </div>
-            <div class="col-lg-1 col-md-6">
-                <button type="button" id="stationFilterReset" class="btn btn-outline-secondary btn-sm w-100">Reset</button>
+            <div class="col-lg-1 col-md-6 d-flex align-items-end">
+                <button type="button" id="stationFilterReset"
+                    class="btn btn-outline-secondary btn-sm w-100">Reset</button>
             </div>
         </div>
-        <div class="small text-muted mb-3">Month and year use the ticket created date. Check Year to Date to enable the date cutoff.</div>
+        <div class="filter-card-hint">Month and year use the ticket created date. Check Year to Date to enable the date cutoff.</div>
+        </div>
         <div class="table-responsive">
             <table class="table table-bordered table-hover align-middle">
-                <thead class="table-info">
+                <thead>
                     <tr>
                         <th>No.</th>
                         <th>Station</th>
                         <th>WIGOS id</th>
-                        <th>Country Stations</th>
-                        <th>Ticket Count</th>
+                        <th>Country</th>
+                        <th class="num">Ticket Count</th>
                     </tr>
                 </thead>
                 <tbody id="stationReportBody">
                     <!-- Filled by JavaScript -->
                 </tbody>
                 <tfoot>
-                    <tr id="stationReportTotals" class="table-secondary">
+                    <tr id="stationReportTotals">
                         <!-- Filled by JavaScript -->
                     </tr>
                 </tfoot>
@@ -555,29 +711,29 @@
         </center>
         <div class="table-responsive">
             <table class="table table-bordered table-hover align-middle">
-                <thead class="table-info">
+                <thead>
                     <tr>
                         <th>WIGOS Ticket Category</th>
-                        <th>Total</th>
-                        <th>Open</th>
-                        <th>In Progress</th>
-                        <th>Closed</th>
-                        <th>Under Investigation</th>
-                        <th>Resolved</th>
-                        <th>Won't Fix</th>
-                        <th>Incident</th>
-                        <th>To Do</th>
-                        <th>In Review</th>
-                        <th>Triage</th>
-                        <th>Escalated</th>
-                        <th>Done</th>
+                        <th class="num">Total</th>
+                        <th class="num">Open</th>
+                        <th class="num">In Progress</th>
+                        <th class="num">Closed</th>
+                        <th class="num">Under Investigation</th>
+                        <th class="num">Resolved</th>
+                        <th class="num">Won't Fix</th>
+                        <th class="num">Incident</th>
+                        <th class="num">To Do</th>
+                        <th class="num">In Review</th>
+                        <th class="num">Triage</th>
+                        <th class="num">Escalated</th>
+                        <th class="num">Done</th>
                     </tr>
                 </thead>
                 <tbody id="categoryReportBody">
                     <!-- Isi otomatis via JavaScript -->
                 </tbody>
                 <tfoot>
-                    <tr id="categoryReportTotals" class="table-secondary">
+                    <tr id="categoryReportTotals">
                         <!-- Diisi via JavaScript: Total per kolom -->
                     </tr>
                 </tfoot>
@@ -662,8 +818,7 @@
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
     <script>
-        // Update tahun secara otomatis di footer
-        document.getElementById('currentYear').textContent = new Date().getFullYear();
+        // Footer uses a fixed year, so no #currentYear element to update.
         const stationItemsPerPage = 10;
         let stationCurrentPage = 1;
         let stationSearchTerm = '';
@@ -708,6 +863,21 @@
             document.getElementById("triageCount").textContent = counts['triage'] || 0;
             document.getElementById("escalatedCount").textContent = counts['escalated'] || 0;
             document.getElementById("doneCount").textContent = counts['done'] || 0;
+
+            hideZeroStatusRows();
+        }
+
+        // The overview lists thirteen Jira statuses; this project's data uses
+        // six. Rows that are zero add noise, so hide them after rendering.
+        function hideZeroStatusRows() {
+            const list = document.querySelector('.summary-box .list-group');
+            if (!list) return;
+            list.querySelectorAll('.list-group-item').forEach(item => {
+                const badge = item.querySelector('.badge');
+                if (!badge) return;
+                const n = Number(String(badge.textContent).trim());
+                item.hidden = Number.isFinite(n) && n === 0;
+            });
         }
 
         // Fungsi pembantu untuk menghitung jumlah issue berdasarkan status
@@ -721,6 +891,43 @@
         }
 
         // Fungsi untuk mengupdate laporan detail per kategori
+
+        // Hide status columns that are all zero for the current filter. The
+        // table declares thirteen Jira statuses, but this project's data only
+        // uses a handful; empty columns just waste width and invite scrolling.
+        function hideEmptyStatusColumns() {
+            const tables = [
+                { table: document.querySelector('#categoryReportBody')?.closest('table') },
+            ];
+            tables.forEach(({ table }) => {
+                if (!table) return;
+                const headCells = [...table.querySelectorAll('thead th')];
+                const rows = [...table.querySelectorAll('tbody tr')];
+                headCells.forEach((th, index) => {
+                    // Keep the category label and the Total column.
+                    if (index <= 1) return;
+                    const allZero = rows.every(row => {
+                        const cell = row.children[index];
+                        if (!cell) return true;
+                        const n = Number(String(cell.textContent).trim());
+                        return !Number.isFinite(n) || n === 0;
+                    });
+                    th.hidden = allZero;
+                    rows.forEach(row => {
+                        if (row.children[index]) row.children[index].hidden = allZero;
+                    });
+                    const footCell = table.querySelector('tfoot tr')?.children[index];
+                    if (footCell) footCell.hidden = allZero;
+                });
+            });
+        }
+
+        function escapeReportHtml(value) {
+            return String(value === null || value === undefined ? '' : value)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
         function updateCategoryDetailReport(issues) {
             const tbody = document.getElementById('categoryReportBody');
             tbody.innerHTML = ''; // Bersihkan isi tabel sebelumnya
@@ -740,20 +947,20 @@
             for (const [category, counts] of Object.entries(categoryCounts)) {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${category}</td>
-                    <td>${counts.total}</td>
-                    <td>${counts.open}</td>
-                    <td>${counts.inprogress}</td>
-                    <td>${counts.closed}</td>
-                    <td>${counts.underinvestigation}</td>
-                    <td>${counts.resolved}</td>
-                    <td>${counts.wontfix}</td>
-                    <td>${counts.incident}</td>
-                    <td>${counts.todo}</td>
-                    <td>${counts.inreview}</td>
-                    <td>${counts.triage}</td>
-                    <td>${counts.escalated}</td>
-                    <td>${counts.done}</td>
+                    <td>${escapeReportHtml(category)}</td>
+                    <td class="num">${counts.total}</td>
+                    <td class="num">${counts.open}</td>
+                    <td class="num">${counts.inprogress}</td>
+                    <td class="num">${counts.closed}</td>
+                    <td class="num">${counts.underinvestigation}</td>
+                    <td class="num">${counts.resolved}</td>
+                    <td class="num">${counts.wontfix}</td>
+                    <td class="num">${counts.incident}</td>
+                    <td class="num">${counts.todo}</td>
+                    <td class="num">${counts.inreview}</td>
+                    <td class="num">${counts.triage}</td>
+                    <td class="num">${counts.escalated}</td>
+                    <td class="num">${counts.done}</td>
                 `;
                 tbody.appendChild(row);
 
@@ -777,22 +984,24 @@
             const tfootRow = document.getElementById('categoryReportTotals');
             if (tfootRow) {
                 tfootRow.innerHTML = `
-                    <th>Total</th>
-                    <th>${totals.total}</th>
-                    <th>${totals.open}</th>
-                    <th>${totals.inprogress}</th>
-                    <th>${totals.closed}</th>
-                    <th>${totals.underinvestigation}</th>
-                    <th>${totals.resolved}</th>
-                    <th>${totals.wontfix}</th>
-                    <th>${totals.incident}</th>
-                    <th>${totals.todo}</th>
-                    <th>${totals.inreview}</th>
-                    <th>${totals.triage}</th>
-                    <th>${totals.escalated}</th>
-                    <th>${totals.done}</th>
+                    <th class="num">Total</th>
+                    <th class="num">${totals.total}</th>
+                    <th class="num">${totals.open}</th>
+                    <th class="num">${totals.inprogress}</th>
+                    <th class="num">${totals.closed}</th>
+                    <th class="num">${totals.underinvestigation}</th>
+                    <th class="num">${totals.resolved}</th>
+                    <th class="num">${totals.wontfix}</th>
+                    <th class="num">${totals.incident}</th>
+                    <th class="num">${totals.todo}</th>
+                    <th class="num">${totals.inreview}</th>
+                    <th class="num">${totals.triage}</th>
+                    <th class="num">${totals.escalated}</th>
+                    <th class="num">${totals.done}</th>
                 `;
             }
+
+            hideEmptyStatusColumns();
         }
 
         // Fungsi pembantu untuk menghitung jumlah issue berdasarkan kategori dan status
@@ -1116,11 +1325,11 @@
             paginatedItems.forEach((item, index) => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${start + index + 1}</td>
-                    <td>${item.station}</td>
-                    <td>${item.wigosId}</td>
-                    <td>${item.country}</td>
-                    <td>${item.count}</td>
+                    <td class="num">${start + index + 1}</td>
+                    <td>${escapeReportHtml(item.station)}</td>
+                    <td>${escapeReportHtml(item.wigosId)}</td>
+                    <td>${escapeReportHtml(item.country)}</td>
+                    <td class="num">${escapeReportHtml(item.count)}</td>
                 `;
                 tbody.appendChild(row);
             });
@@ -1128,7 +1337,7 @@
             const totalTickets = stationCounts.reduce((sum, item) => sum + item.count, 0);
             tfootRow.innerHTML = `
                 <th colspan="4">Total</th>
-                <th>${totalTickets}</th>
+                <th class="num">${totalTickets}</th>
             `;
         }
 
