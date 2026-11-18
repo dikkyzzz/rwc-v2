@@ -3,338 +3,545 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login - RWC Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="description" content="RWC Indonesia admin panel. Sign in to manage Jira ticket monitoring for Regional WIGOS Centre Indonesia staff.">
+    <title>Admin Sign In — RWC Indonesia</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --ink: #040433;
+            --ink-soft: #151538;
+            --primary: #1e4f9c;
+            --primary-mid: #2f6bc4;
+            --primary-light: #5b93dd;
+            --accent: #f5a623;
+            --surface: #ffffff;
+            --muted: #5b6474;
+            --line: #e4e8ef;
+            --field-bg: #f7f9fd;
+            --success: #0f9d58;
+            --danger: #d6361f;
+        }
+
+        * { box-sizing: border-box; }
+
         body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f4f7f6;
+            margin: 0;
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            font-family: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background: #eef2f8;
+            color: var(--ink);
+            display: grid;
+            place-items: center;
             padding: 2rem;
         }
 
-        .login-card {
-            background: white;
-            border-radius: 12px;
-            padding: 3rem;
+        :focus-visible {
+            outline: 3px solid rgba(91, 147, 221, 0.65);
+            outline-offset: 2px;
+            border-radius: 6px;
+        }
+
+        .shell {
             width: 100%;
-            max-width: 450px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            max-width: 1040px;
+            display: grid;
+            grid-template-columns: minmax(320px, 1.05fr) minmax(360px, 1fr);
+            background: var(--surface);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 30px 80px rgba(4, 4, 51, 0.18);
         }
 
-        .login-header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .logo-wrapper {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .logo-wrapper img {
-            height: 50px;
-            width: auto;
-            object-fit: contain;
-        }
-
-        .login-header h2 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #040433;
-            margin-bottom: 0.5rem;
-        }
-
-        .login-header p {
-            color: #6c757d;
-            font-size: 0.9rem;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: #495057;
-            margin-bottom: 0.5rem;
-            display: block;
-        }
-
-        .input-wrapper {
+        /* ---------- Brand panel ---------- */
+        .brand {
             position: relative;
-        }
-
-        .input-wrapper i {
-            position: absolute;
-            left: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #adb5bd;
-            font-size: 1.1rem;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 0.9rem 1rem 0.9rem 3rem;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
-        }
-
-        #password {
-            padding-right: 3.8rem;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: #0d6efd;
-            box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
-        }
-
-        .password-toggle {
-            position: absolute;
-            right: 0.85rem;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: #adb5bd;
-            cursor: pointer;
-            width: 2rem;
-            height: 2rem;
-            padding: 0;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.1rem;
-        }
-
-        .password-toggle:hover {
-            color: #0d6efd;
-        }
-
-        .btn-login {
-            width: 100%;
-            padding: 0.9rem;
-            background: #0d6efd;
-            border: none;
-            border-radius: 8px;
-            color: white;
-            font-weight: 600;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            padding: 2rem 2rem 2.25rem;
             display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
+            flex-direction: column;
+            color: #fff;
+            background:
+                radial-gradient(circle at 88% -12%, rgba(245, 166, 35, 0.26), transparent 44%),
+                radial-gradient(circle at -15% 112%, rgba(91, 147, 221, 0.35), transparent 48%),
+                linear-gradient(160deg, #151538 0%, #1e4f9c 58%, #16386a 100%);
+            overflow: hidden;
         }
 
-        .btn-login:hover {
-            background: #0b5ed7;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+        /* fine dot grid, quiet texture */
+        .brand::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+            background-size: 22px 22px;
+            pointer-events: none;
         }
 
-        .btn-login:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-            transform: none;
+        .brand-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            gap: 1.25rem;
         }
 
-        .alert {
-            border-radius: 8px;
-            border: none;
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-            font-size: 0.9rem;
+        .brand-top {
             display: flex;
             align-items: center;
             gap: 0.75rem;
+            font-size: 0.72rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.62);
         }
 
-        .alert-danger {
-            background: #fee2e2;
-            color: #dc2626;
+        .brand-top .rule {
+            flex: 1;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.18);
         }
 
-        .alert-success {
-            background: #d1fae5;
-            color: #059669;
+        .brand-mark {
+            background: #fff;
+            border-radius: 14px;
+            padding: 0.75rem 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            align-self: flex-start;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
         }
 
-        .back-link {
-            text-align: center;
-            margin-top: 1.5rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid #e9ecef;
+        .brand-mark img {
+            display: block;
+            width: 190px;
+            max-width: 100%;
+            height: auto;
         }
 
-        .back-link a {
-            color: #6c757d;
-            text-decoration: none;
-            font-size: 0.9rem;
+        .brand h1 {
+            margin: 0;
+            font-size: clamp(1.7rem, 3.2vw, 2.15rem);
+            font-weight: 700;
+            line-height: 1.18;
+            letter-spacing: -0.01em;
+        }
+
+        .brand h1 span { color: var(--accent); }
+
+        .brand p {
+            margin: 0;
+            font-size: 0.92rem;
+            line-height: 1.65;
+            color: rgba(255, 255, 255, 0.78);
+            max-width: 42ch;
+        }
+
+        .brand-meta {
+            list-style: none;
+            margin: auto 0 0;
+            padding: 1.25rem 0 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.18);
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1rem 1.25rem;
+        }
+
+        .brand-meta li {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+        }
+
+        .brand-meta small {
+            font-size: 0.68rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.55);
+        }
+
+        .brand-meta strong {
+            font-size: 0.86rem;
+            font-weight: 600;
+            color: #fff;
+            line-height: 1.4;
+        }
+
+        .panel {
+            padding: 2.5rem 2.5rem 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 1.5rem;
+        }
+
+        .panel-head h2 {
+            margin: 0 0 0.35rem;
+            font-size: 1.45rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            color: var(--ink);
+        }
+
+        .panel-head p {
+            margin: 0;
+            font-size: 0.88rem;
+            line-height: 1.6;
+            color: var(--muted);
+        }
+
+        .alert {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.6rem;
+            padding: 0.75rem 0.9rem;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            line-height: 1.45;
+            border: 1px solid transparent;
+        }
+
+        .alert i { font-size: 1.05rem; line-height: 1.3; }
+        .alert-danger { background: #fdeeec; border-color: #f3c0b4; color: var(--danger); }
+        .alert-success { background: #e9f8ee; border-color: #b9e5cc; color: var(--success); }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            margin-bottom: 1.1rem;
+        }
+
+        .field label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--ink-soft);
+        }
+
+        .control {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .control > i.lead {
+            position: absolute;
+            left: 0.9rem;
+            color: #97a3b8;
+            font-size: 1.05rem;
+            pointer-events: none;
+        }
+
+        .control input {
+            width: 100%;
+            padding: 0.82rem 3.2rem 0.82rem 2.6rem;
+            font-family: inherit;
+            font-size: 0.95rem;
+            color: var(--ink);
+            background: var(--field-bg);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+        }
+
+        .control input::placeholder { color: #a6b0c2; }
+
+        .control input:hover { border-color: #cdd6e6; }
+
+        .control input:focus {
+            outline: none;
+            background: #fff;
+            border-color: var(--primary-mid);
+            box-shadow: 0 0 0 4px rgba(47, 107, 196, 0.14);
+        }
+
+        .toggle {
+            position: absolute;
+            right: 0.4rem;
+            width: 2.3rem;
+            height: 2.3rem;
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
-            transition: color 0.3s ease;
+            justify-content: center;
+            border: 0;
+            border-radius: 8px;
+            background: transparent;
+            color: #97a3b8;
+            cursor: pointer;
+            transition: color 0.18s ease, background 0.18s ease;
         }
 
-        .back-link a:hover {
-            color: #0d6efd;
+        .toggle:hover { color: var(--primary-mid); background: rgba(47, 107, 196, 0.08); }
+
+        .submit {
+            width: 100%;
+            margin-top: 0.25rem;
+            padding: 0.85rem 1rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.55rem;
+            border: 0;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary-mid), var(--primary));
+            color: #fff;
+            font-family: inherit;
+            font-size: 0.96rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+        }
+
+        .submit:hover { transform: translateY(-1px); box-shadow: 0 12px 28px rgba(30, 79, 156, 0.35); }
+        .submit:active { transform: translateY(0); }
+        .submit:disabled { opacity: 0.7; cursor: progress; transform: none; box-shadow: none; }
+
+        .panel-foot {
+            border-top: 1px solid var(--line);
+            padding-top: 1.1rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            font-size: 0.8rem;
+            color: var(--muted);
+        }
+
+        .panel-foot a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .panel-foot a:hover { text-decoration: underline; }
+
+        .spinner {
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+
+        .d-none { display: none !important; }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .visually-hidden {
+            position: absolute;
+            width: 1px; height: 1px;
+            margin: -1px; padding: 0; border: 0;
+            clip: rect(0 0 0 0);
+            clip-path: inset(50%);
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        /* ---------- Responsive ---------- */
+        @media (max-width: 900px) {
+            body { padding: 1rem; align-items: stretch; }
+            .shell { grid-template-columns: 1fr; max-width: 520px; }
+            .brand { padding: 1.5rem 1.5rem 1.75rem; }
+            .brand-mark img { width: 150px; }
+            .panel { padding: 1.75rem 1.5rem 1.5rem; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
         }
     </style>
 </head>
 <body>
-    <div class="login-card">
-        <div class="login-header">
-            <div class="logo-wrapper">
-                <img src="/logowmo.png" alt="WMO Logo">
-                <img src="/logo-bmkg.webp" alt="BMKG Logo">
-                <img src="/logo-update.svg" alt="RWC Logo">
-            </div>
-            <h2>Login</h2>
-            <p>Sign in to access admin panel for RWC Indonesia</p>
-        </div>
-
-        <div id="alertContainer"></div>
-
-        <form id="loginForm">
-            <div class="form-group">
-                <label for="username">Email Address</label>
-                <div class="input-wrapper">
-                    <input type="email" class="form-control" id="username" placeholder="Email Address" required>
-                    <i class="bi bi-envelope"></i>
+    <main class="shell" aria-labelledby="signin-title">
+        <!-- Brand panel: who operates this and why -->
+        <aside class="brand" aria-label="RWC Indonesia">
+            <div class="brand-content">
+                <div class="brand-top">
+                    Admin Panel
+                    <span class="rule" aria-hidden="true"></span>
+                    WMO RA-V
                 </div>
-            </div>
 
-            <div class="form-group">
-                <label for="password">Password</label>
-                <div class="input-wrapper">
-                    <input type="password" class="form-control" id="password" placeholder="Password" required>
-                    <i class="bi bi-lock"></i>
-                    <button type="button" class="password-toggle" onclick="togglePassword()">
-                        <i class="bi bi-eye" id="toggleIcon"></i>
-                    </button>
+                <div class="brand-mark">
+                    <img src="/logo-update.svg" alt="RWC Indonesia — Regional WIGOS Centre">
                 </div>
+
+                <h1 id="signin-title">Regional WIGOS Centre <span>Indonesia</span></h1>
+                <p>
+                    Administrative access for the Jira ticket monitoring portal used by RWC Indonesia
+                    to coordinate data quantity incidents across the South-West Pacific region.
+                </p>
+
+                <ul class="brand-meta">
+                    <li>
+                        <small>Region</small>
+                        <strong>WMO Regional Association V</strong>
+                    </li>
+                    <li>
+                        <small>Operated by</small>
+                        <strong>BMKG, in partnership with WMO</strong>
+                    </li>
+                    <li>
+                        <small>Access</small>
+                        <strong>RWC Indonesia administrators</strong>
+                    </li>
+                    <li>
+                        <small>Scope</small>
+                        <strong>Ticket monitoring and reporting</strong>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Sign-in -->
+        <section class="panel">
+            <div class="panel-head">
+                <h2>Administrator sign in</h2>
+                <p>Use the credentials issued to you. Contact the RWC secretariat if you no longer have access.</p>
             </div>
 
-            <button type="submit" class="btn-login" id="loginBtn">
-                <span id="loginText">Sign In</span>
-                <span id="loginSpinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
-            </button>
-        </form>
+            <div id="alertContainer" aria-live="polite"></div>
 
-        <div class="back-link">
-            <a href="issues">
-                <i class="bi bi-arrow-left"></i>
-                Back to Home
-            </a>
-        </div>
-    </div>
+            <form id="loginForm" novalidate>
+                <div class="field">
+                    <label for="username">Email address</label>
+                    <div class="control">
+                        <i class="bi bi-envelope lead" aria-hidden="true"></i>
+                        <input type="email" id="username" name="username" autocomplete="username"
+                               placeholder="name@bmkg.go.id" required autofocus inputmode="email">
+                    </div>
+                </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+                <div class="field">
+                    <label for="password">Password</label>
+                    <div class="control">
+                        <i class="bi bi-lock lead" aria-hidden="true"></i>
+                        <input type="password" id="password" name="password" autocomplete="current-password"
+                               placeholder="Your password" required>
+                        <button type="button" class="toggle" id="togglePassword"
+                                aria-label="Show password" aria-pressed="false" aria-controls="password">
+                            <i class="bi bi-eye" id="toggleIcon" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit" id="loginBtn">
+                    <i class="bi bi-box-arrow-in-right" id="loginIcon" aria-hidden="true"></i>
+                    <span id="loginText">Sign in</span>
+                    <span id="loginSpinner" class="spinner d-none" role="status" aria-hidden="true"></span>
+                    <span class="visually-hidden">Signing in</span>
+                </button>
+            </form>
+
+            <div class="panel-foot">
+                <span><i class="bi bi-shield-lock" aria-hidden="true"></i> Restricted to authorised RWC staff</span>
+                <a href="/"><i class="bi bi-arrow-left" aria-hidden="true"></i> Back to home</a>
+            </div>
+        </section>
+    </main>
+
     <script>
-        function togglePassword() {
-            const passwordInput = document.getElementById('password');
-            const toggleIcon = document.getElementById('toggleIcon');
-            
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                toggleIcon.classList.remove('bi-eye');
-                toggleIcon.classList.add('bi-eye-slash');
-            } else {
-                passwordInput.type = 'password';
-                toggleIcon.classList.remove('bi-eye-slash');
-                toggleIcon.classList.add('bi-eye');
-            }
+        const passwordInput = document.getElementById('password');
+        const toggleButton = document.getElementById('togglePassword');
+        const toggleIcon = document.getElementById('toggleIcon');
+
+        toggleButton.addEventListener('click', () => {
+            const showing = passwordInput.type === 'text';
+            passwordInput.type = showing ? 'password' : 'text';
+            toggleIcon.classList.toggle('bi-eye', showing);
+            toggleIcon.classList.toggle('bi-eye-slash', !showing);
+            toggleButton.setAttribute('aria-pressed', String(!showing));
+            toggleButton.setAttribute('aria-label', showing ? 'Show password' : 'Hide password');
+            passwordInput.focus({ preventScroll: true });
+        });
+
+        const form = document.getElementById('loginForm');
+        const loginBtn = document.getElementById('loginBtn');
+        const loginText = document.getElementById('loginText');
+        const loginSpinner = document.getElementById('loginSpinner');
+        const loginIcon = document.getElementById('loginIcon');
+
+        function setBusy(busy) {
+            loginBtn.disabled = busy;
+            loginText.classList.toggle('d-none', busy);
+            loginSpinner.classList.toggle('d-none', !busy);
+            loginIcon.classList.toggle('d-none', busy);
         }
 
-        document.getElementById('loginForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
             const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value;
-            const loginBtn = document.getElementById('loginBtn');
-            const loginText = document.getElementById('loginText');
-            const loginSpinner = document.getElementById('loginSpinner');
-            
-            loginBtn.disabled = true;
-            loginText.classList.add('d-none');
-            loginSpinner.classList.remove('d-none');
-            
+            const password = passwordInput.value;
+
+            if (!username || !password) {
+                showAlert('Enter both your email address and password.', 'danger');
+                return;
+            }
+
+            setBusy(true);
+
             try {
                 const response = await fetch('/api/admin/login', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username, password })
                 });
-                
-                const responseText = await response.text();
-                let data;
-                
+
+                let data = null;
                 try {
-                    data = JSON.parse(responseText);
-                } catch (parseError) {
-                    showAlert('Server error: Invalid response', 'danger');
+                    data = await response.json();
+                } catch {
+                    showAlert('The server returned an unreadable response. Try again.', 'danger');
                     return;
                 }
-                
+
                 if (response.ok) {
-                    // The server sets an httpOnly admin_session cookie; nothing
-                    // needs to be written to localStorage any more.
-                    showAlert('Login successful! Redirecting...', 'success');
-                    setTimeout(() => {
-                        window.location.href = 'admin';
-                    }, 1000);
+                    showAlert('Signed in. Opening the admin panel…', 'success');
+                    // The server sets an httpOnly admin_session cookie.
+                    setTimeout(() => { window.location.href = 'admin'; }, 800);
                 } else {
-                    showAlert(data.message || 'Login failed', 'danger');
+                    showAlert(data?.message || 'Those credentials were not accepted.', 'danger');
                 }
             } catch (error) {
-                console.error('Login error:', error);
-                showAlert('An error occurred during login', 'danger');
+                console.error('Admin login error:', error);
+                showAlert('Could not reach the server. Check your connection and try again.', 'danger');
             } finally {
-                loginBtn.disabled = false;
-                loginText.classList.remove('d-none');
-                loginSpinner.classList.add('d-none');
+                setBusy(false);
             }
         });
 
         function showAlert(message, type) {
-            const alertContainer = document.getElementById('alertContainer');
             const icon = type === 'danger' ? 'bi-exclamation-circle' : 'bi-check-circle';
-            alertContainer.innerHTML = `
+            document.getElementById('alertContainer').innerHTML = `
                 <div class="alert alert-${type}" role="alert">
-                    <i class="bi ${icon}"></i>
-                    ${message}
-                </div>
-            `;
+                    <i class="bi ${icon}" aria-hidden="true"></i>
+                    <span>${escapeHtml(message)}</span>
+                </div>`;
         }
 
-        window.addEventListener('load', function() {
-            // Session cookie decides; no token needed in the browser.
-            fetch('/api/admin/session')
-                .then(response => {
-                    if (response.ok) {
-                        window.location.href = 'admin';
-                    }
-                })
-                .catch(() => {});
-        });
+        function escapeHtml(value) {
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        // If a session already exists, skip the form.
+        fetch('/api/admin/session')
+            .then((response) => { if (response.ok) window.location.href = 'admin'; })
+            .catch(() => {});
     </script>
 </body>
 </html>
