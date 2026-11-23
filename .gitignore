@@ -61,3 +61,7 @@ Thumbs.db
 
 # --- Command Code ---------------------------------------------
 .commandcode/
+
+# Local checkout of the WIRA chatbot repo (served at /wira).
+# Not a submodule: the build context is provided via WIRA_SRC_DIR.
+chatbot-wira-upstream/
